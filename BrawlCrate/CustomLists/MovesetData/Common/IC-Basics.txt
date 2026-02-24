@@ -1,0 +1,224 @@
+*0x000
+IC-23030: Read on left/right input on joystick on ground (unsure of what it does)
+
+0x004 Walk Sensitivty
+IC-3117: Walk Sensitivty
+
+0x008 Walk Accel Multiplier
+IC-3118: Walk Accel Multiplier
+
+0x00C
+IC-3119:
+
+0x010 Walk Maximum Animation Speed
+IC-3120: Walk Maximum Animation Speed
+
+0x014 Turn Sensitivity
+IC-3121: Turn Sensitivity
+
+0x018 Dash, Pivot, & F-Smash Sensitivity
+IC-3122: Dash, Pivot, & F-Smash Sensitivity
+
+*0x01C
+IC-23031: Dash/Turn Input Window??
+
+0x020 Dash > Item Toss/Drop Input Window
+IC-3123: Dash > Item Toss/Drop Input Window (Frames)
+
+0x024
+IC-3124:
+
+*0x028 Dashdance Window
+IC-23032: Dashdance window? (allows Turn2 for 6 frames at the start of a dash)
+
+*0x02C Foxtrot Window
+IC-23033: Foxtrot window? (allows Dash from Dash on this frame and later)
+
+0x030 Dash Exit Momentum Multiplier
+IC-3125: Dash Exit Momentum Multiplier
+
+0x034 Run Sensitivity
+IC-3126: Run Sensitivity
+
+0x038 Run Accel Multiplier
+IC-3127: Run Accel Multiplier
+
+0x03C RunBrake Friction Multiplier
+IC-3128: Dash > RunBrake Friction Multiplier
+
+0x040 Max Dash Runbrake Speed Multiplier
+IC-3129: Max Run Speed Multiplier to occur Dash > RunBrake
+
+*0x044 
+IC-23034:
+
+0x048 Turn Grab Sensitivity
+IC-3130: Turn Grab Sensitivity
+
+0x04C Turn Action Cancel Window
+IC-3131: Turn > F-Tilt/F-Smash/Side B/Item-Toss input window
+
+0x050 Turn Run Ledge Accel Multiplier
+IC-3132: TurnRun Accel Multiplier on the Ledge
+
+0x054 Crouch/TetherDrop Sensitivity
+IC-3133: Crouch/TetherDrop Sensitivity
+
+0x058 CrawlF Min Sensitivity
+IC-3134: Forward Crawl Min Sensitivity
+
+0x05C CrawlF Max Sensitivity
+IC-3135: Forward Crawl Max Sensitivity
+
+0x060 CrawlB Min Sensitivity
+IC-3136: Backward Crawl Min Sensitivity
+
+0x064 CrawlB Max Sensitivity
+IC-3137: Backward Crawl Max Sensitivity
+
+0x068 Tap Jump Sensitivity
+IC-3138: Tap Jump Sensitivity
+
+*0x06C Tap Jump Input Window
+IC-23035: Tap Jump Input Window??
+
+0x070 Jump H Sensitivity
+IC-3139: JumpF/JumpB Sensitivity
+
+0x074 Tap Short Hop Sensitivity
+IC-3140: Shorthop with Tap Jump Sensitivity
+
+0x078 Dash/Run Tap Jump Sensitivity
+IC-3141: Dash/Run Tap Jump Sensitivity
+
+0x07C
+IC-3142: (Related to Footstools.)
+
+0x080
+IC-3143:
+
+0x084
+IC-3144:
+
+*0x088 
+IC-23036: Fall->Jump...??
+
+0x08C
+IC-3145: (Related to FallF & FallB animations.)
+
+0x090 Fall Animation Lean Max Blend Speed
+IC-3146: Maximum Animation Blend Speed for Fall > FallF/FallB
+
+0x094 Fall Animation Lean Min Blend Speed
+IC-3147: Minimum Blend Speed for Fall > FallF/FallB
+
+0x098 Spotdodge Sensitivity
+IC-3148: Spotdodge Sensitivity
+
+*0x09C SpotDodge Input Window
+IC-23037: SpotDodge Input Window
+
+0x0A0 Roll Sensitivity
+IC-3149: Roll Sensitivity
+
+*0x0A4 Roll Input Window
+IC-23038: Roll Input Window
+
+0x0A8
+IC-3150:
+
+0x0AC F-Tilt Threshold
+IC-3151: F-Tilt Threshold
+
+0x0B0 F-Tilt Up Threshold
+IC-3152: F-Tilt Up Threshold
+
+0x0B4 F-Tilt Down Threshold
+IC-3153: F-Tilt Down Threshold
+
+0x0B8 U-Tilt Threshold
+IC-3154: U-Tilt Threshold
+
+0x0BC D-Tilt Threshold
+IC-3155: D-Tilt Threshold
+
+0x0C0 F-Smash Up Threshold
+IC-3156: F-Smash Up Threshold
+
+0x0C4 F-Smash Down Threshold
+IC-3157: F-Smash Down Threshold
+
+0x0C8 U-Smash Sensitivity
+IC-3158: U-Smash Sensitivity
+
+0x0CC U-Smash Input Window
+IC-3159: U-Smash Input Window
+
+0x0D0 D-Smash Sensitivity
+IC-3160: D-Smash Sensitivity
+
+0x0D4 D-Smash Input Window
+IC-3161: D-Smash Input Window
+
+0x0D8 Smash Damage Charge Multiplier
+IC-3162: Fully charged smash damage multiplier
+
+0x0DC Smash Charge Interrupt Counter Multiplier
+IC-3163: Smash charge interrupt knockback multiplier
+
+0x0E0 F/B-Aerial Sensitivity
+IC-3164: F-air/B-air Stick Sensitivity
+
+0x0E4 U/D-Aerial Sensitivity
+IC-3165: U-air/D-air Stick Sensitivity
+
+0x0E8
+IC-3166:
+
+0x0EC Fastfall Sensitivity
+IC-3167: Fastfall Sensitivity
+
+*0x0F0 FastFall Input Window
+IC-23039: FastFall Input Window
+
+0x0F4 RunBrake Jump Y Sensitivity
+IC-3168: Y Sensitivity to JumpSquat while RunBrake
+
+*0x0F8
+IC-23040:
+
+0x0FC GlideLanding Minimum Glide Time
+IC-3169: Minimum Gliding frames required to go to GlideLanding
+
+0x100 GlideLanding Minimum H Speed
+IC-3170: Minimum Speed upon landing for GlideLanding\
+
+0x104 Crouch Cancel Hitlag Multiplier
+IC-3171: Hitlag Multiplier while Crouching or Entering Crouch
+
+0x108 Crouch Cancel KB Multiplier
+IC-3172: KB Multiplier while Crouching (Unused in Brawl.)
+
+0x10C Input Distance Threshold for Smash DI
+IC-3173: Input Distance Threshold for Smash DI
+
+*0x110 SDI Input Window
+IC-23041: Smash DI Input Window
+
+0x114 SDI Distance
+IC-3174: Smash DI Distance
+
+0x118 ASDI Distance
+IC-3175: Automatic Smash DI Distance
+
+0x11C Shield SDI Distance Multiplier
+IC-3176: Shield SDI Distance Multiplier
+
+0x120 AirHitLand Y Velocity Threshold
+IC-3177: Downward Velocity required to hit the floor in action 44
+
+0x124 
+IC-3178:
+
+*0x128 Cape Reverse Control Time
+IC-23042: Caped reversed control time (minus 5)

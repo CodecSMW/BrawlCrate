@@ -1,0 +1,62 @@
+02090200
+0
+
+020A0100
+0
+
+020B0100
+0
+
+020C0100
+0
+
+
+Main
+Ground Special
+Ground Item
+Ground Catch
+Ground Attack
+Ground Escape
+Ground Guard
+Ground Jump
+Ground (Other)
+Air Landing
+Grab Edge
+Air Special
+Air Item Throw
+Air Lasso
+Air Dodge
+Air Attack
+Air Tread Jump
+Air Walljump
+Air Jump Aerial
+Fall Through Platform (Squat Only)
+
+08000100
+0
+
+
+Undefined(0)
+Can drop off side of stage
+Can't drop off side of stage
+Undefined(3)
+Undefined(4)
+In Air; Can leave stage vertically
+
+0E060100
+0
+
+
+Undefined(0)
+Vertical
+Horizontal
+
+1E000200
+0
+
+
+None
+Super Armor
+Knockback Based Heavy Armor
+Damage Based Heavy Armor
+

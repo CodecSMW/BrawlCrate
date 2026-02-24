@@ -1,0 +1,29 @@
+0x00 Freshness Bonus
+Bonus Multiplier for a move not in the stale queue.
+
+0x04 Stale Level 1
+
+
+0x08 Stale Level 2
+
+
+0x0C Stale Level 3
+
+
+0x10 Stale Level 4
+
+
+0x14 Stale Level 5
+
+
+0x18 Stale Level 6
+
+
+0x1C Stale Level 7
+
+
+0x20 Stale Level 8
+
+
+0x24 Stale Level 9
+

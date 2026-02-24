@@ -1,0 +1,140 @@
+0x000 Hitstun Constant
+IC-2002
+
+0x004 Damage 2 Animation Threshold
+IC-2003: Hitstun frames threshold or entering Damage_2 non-tumble animations
+
+0x008 Damage 3 Animation Threshold
+IC-2004: Hitstun frames threshold or entering Damage_2 non-tumble animations
+
+0x00C DamageFly Animation Threshold
+IC-2005: Hitstun frames threshold or entering DamageFly_ tumble animations (80 KB with a 0.4 hitstun constant)
+
+*0x010 Meteor Smash Range Min
+IC-22001: Lower angle threshold for meteor smash range
+
+*0x014 Meteor Smash Range Max
+IC-22002: Upper angle threshold for meteor smash range
+
+0x018 Move angle against aerial opponents for Sakurai Angle
+IC-2006: Move angle against aerial opponents for Sakurai angle (in radians)
+
+0x01C Sakurai Angle Knockback Cap
+IC-2007: 361 angle cap (angle scales from 0 to this within the KB thresholds below)
+
+0x020 Sakurai Angle Lower Threshold
+IC-2008: 361 angle lower KB threshold
+
+0x024 Sakurai Angle Upper Threshold
+IC-2009: 361 angle upper KB threshold
+
+0x028 Knockback to Launch Speed Conversion Multiplier
+IC-2010: Multiplier to convert Knockback into Launch Speed (tumble threshold is 2.4 with 0.4 hitstun constant)
+
+0x02C Maximum Grounded Launch Speed
+IC-2011: Maximum grounded Launch Speed
+
+0x030 Follow Me Angle Launch Speed Multiplier
+IC-2012: Launch Speed multiplier for 365 angle moves
+
+0x034 Minimum Grounded Knockback Bounce Angle
+IC-2013: Min launch angle below ground to bounce off while grounded (radians)
+
+0x038 Ground Ricochet Speed Multiplier
+IC-2014: Grounded stage bounce V launch speed multiplier.
+
+0x03C DamageFlyTop Range Min
+IC-2015: Min angle for DamageFlyTop
+
+0x040 DamageFlyTop Range Max
+IC-2016: Max angle for DamageFlyTop
+
+*0x044 DamageFlyRoll Minimum Damage
+IC-22003: Minimum damage to use the DamageFlyRoll knockback animation
+
+0x048 DamageFlyRoll Probability
+IC-2017: Odds for DamageFlyRoll KB animation when at 100%+ damage
+
+0x04C Hitstop Maximum
+IC-2018: Hitstop Maximum
+
+0x050 Hitstop Multiplier
+IC-2019: Hitstop Multiiplier
+
+0x054 Hitstop Base Amount
+IC-2020: Base Hitstop Amount
+
+*0x058 Alternative Damage GFX Probability
+IC-22004: Odds of 2nd type of getting-hit GFX
+
+0x05C
+IC-2021: Affects amount of time spent shaking in hitlag (does not apply to electrical hitlag)
+
+0x060
+IC-2022: Affects amount of time spent shaking in hitlag (does not apply to electrical hitlag)
+
+*0x064
+
+
+*0x068
+
+
+0x06C
+IC-2023: V launch speed multiplier for moves with Reverse Effect (cape)
+
+0x070
+IC-2024: H launch speed multiplier for moves with Reverse Effect (cape)
+
+0x074
+IC-2025: Minimum knockback to lock characters during DownDamage
+
+0x078
+IC-2026: Minimum knockback for longer lock animation
+
+0x07C
+IC-2027: Maximum launch angle to lock (only matters on very steep slopes)
+
+0x080 Electric Hitstop Constant
+IC-2028: Electric Hitstop Constant
+
+0x084 Paralyze Hitlag Base Time
+IC-2029: Time spent in paralyze hitlag
+
+0x088 Paralyze Hitlag Multiplier
+IC-2030: Time spent in paralyze hitlag multiplier
+
+0x08C Paralyze Opponent Hitlag Time
+IC-2031: Paralyze effect hitlag for opponent
+
+0x090 Tripping Effect Base KB Threshold
+IC-2032: Minimum KB before tripping is possible when hit
+
+0x094 Grab Break Damage Single Hit Threshold
+IC-2033: Total damage from outside sources per hit while grabbed to cause grab break
+
+0x098 Grab Break Damage Threshold
+IC-2034: Total damage from outside sources while grabbed to cause a grab break
+
+0x09C Screenshake Knockback Minimum
+IC-2035: KB threshold for screen shaking (weak)
+
+0x0A0 Heavy Screenshake Knockback Minimum
+IC-2036: KB threshold for screen shaking (strong)
+
+0x0A4 Max Clank Damage Diffference Limit
+IC-2037: Damage difference threshold for clanking
+
+0x0A8 Rebound Pushback Multiplier
+IC-2038: Rebound pushback formula: (((damage * [2038]) + [2039]) * [2040]) + [2041]
+
+0x0AC Rebound Pushback Addition
+IC-2039: Rebound pushback formula: (((damage * [2038]) + [2039]) * [2040]) + [2041]
+
+0x0B0 Rebound Pushback Secondary Multiplier
+IC-2040: Rebound pushback formula: (((damage * [2038]) + [2039]) * [2040]) + [2041]
+
+0x0B4 Rebound Pushback Base
+IC-2041: Rebound pushback formula: (((damage * [2038]) + [2039]) * [2040]) + [2041]
+
+*0x0B8 Projectile Max Reflect Count 
+IC-22005: Max amount of times projectiles can be reflected

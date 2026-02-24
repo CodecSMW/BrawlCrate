@@ -1,0 +1,128 @@
+Thread has Finished
+Animation End
+Animation has looped?
+On Ground
+In Air
+Holding a Ledge
+On a Passable Floor
+Compare (Scalar/Float)
+Bit is Set
+Facing Right
+Facing Left
+Hitbox Connects
+Touching a Floor, Wall, or Ceiling
+Is Throwing Someone
+0E
+Returns True
+10
+11
+12
+13
+Is in Hitlag
+Article Exists
+Is Overstepping an Edge
+Distance from Floor
+18
+Raycasted
+1A
+Change in Air/Ground State
+Article Available
+Current Triggered Status ID
+Interrupt Available
+Holding Item
+Holding Item of Type
+Light Item is in Grabbing Range
+Heavy Item is in Grabbing Range
+Item of Type(?) is in Grabbing Range
+Turning with Item
+Partial Animation End?
+Partial Animation Loop?
+Secondary Animation End?
+Secondary Animation Loop?
+Returns False
+Is in Water
+Roll A Die
+Subaction Exists
+Random Chance
+Button Mashing? Status Expired (sleep/bury/freeze)?
+Is Not in Damaging Magnifier
+Button Press Occurs
+Button Becomes Released
+Button is Held Down
+Button in Pressable State
+Stick Direction Pressed?
+Stick Direction Not Pressed?
+36
+Is Being Thrown by Someone (1)
+Is Being Thrown by Someone (2)
+In Ledge Grabbing Range
+Has Passed Over an Edge (Forward)
+Has Passed Over an Edge (Backward)
+Is Holding Someone in a Grab
+Hitbox has Connected
+3E
+3F
+40
+41
+42
+43
+44
+45
+46
+Pick Up an Item
+48
+Is Camera Locked?
+Compare (Value/Int)
+Has Been Reflected (Article Only)
+Has Been Hit by Cape Effect
+SDI Input (PM)
+Any Shield Input Occurs (PM)
+Any Shield Input Held (PM)
+Any Taunt Input Occurs (PM)
+Any Taunt Input Held (PM)
+Specific Hitbox Connects (Custom)
+53
+54
+55
+56
+57
+58
+59
+5A
+5B
+5C
+5D
+5E
+5F
+Thread is Null (Custom)
+61
+62
+63
+64
+65
+66
+67
+68
+69
+6A
+6B
+6C
+6D
+6E
+6F
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+7A
+7B
+7C
+7D
+7E
+7F

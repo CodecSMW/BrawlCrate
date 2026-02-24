@@ -1,0 +1,23 @@
+270F
+Used An Air Jump & Holding Jump
+In Walljump Situation
+In Wallcling Situation
+Is Within Footstool Range.
+Has Slipped?
+2715
+Is Falling + Hit Down
+Has Smash Ball
+Has Hammer?
+Can Pick Up Another Item
+Successfully Tethered Ledge
+Can Smash Taunt
+Is Human Player
+F-Smash Shortcut
+U-Smash Shortcut?
+D-Smash Shortcut?
+Smash Button or Attack Button are pressed
+2721
+2722
+2723
+Fighter Loaded
+Tap Jump On & C-Stick Not Held

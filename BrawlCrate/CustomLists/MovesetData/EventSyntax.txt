@@ -1,0 +1,381 @@
+00010100
+\name(): frames=\value(0)
+
+00020100
+\name(): frames=\value(0)
+
+00040100
+\name() \if(\unhex(\value(0)),==,-1, Infinite, \unhex(\value(0)) Times)
+
+00070100
+\name() \value(0)
+
+00090100
+\name() \value(0)
+
+000A0100
+\name() \value(0):
+
+000A0200
+If \value(0): \value(1)
+
+000A0300
+If \value(0): \value(1); Unknown=\value(2)
+
+000A0400
+If \value(0): \value(1) \cmpsign(\value(2)) \value(3)
+
+000A0500
+If \value(0): \value(1); Unknown=\value(2), \value(3), & \value(4)
+
+000B0100
+And \value(0):
+
+000B0200
+And \value(0): \value(1)
+
+000B0300
+And \value(0): \value(1); Unknown=\value(2)
+
+000B0400
+And \value(0): \value(1) \cmpsign(\value(2)) \value(3)
+
+000B0500
+Or \value(0): \value(1); Unknown=\value(2), \value(3), & \value(4)
+
+000C0100
+Or \value(0):
+
+000C0200
+Or \value(0): \value(1)
+
+000C0300
+Or \value(0): \value(1); Unknown=\value(2)
+
+000C0400
+Or \value(0): \value(1) \cmpsign(\value(2)) \value(3)
+
+000D0100
+Else If \value(0):
+
+000D0200
+Else If \value(0): \value(1)
+
+000D0300
+Else If \value(0): \value(1); Unknown=\value(2)
+
+000D0400
+Else If \value(0): \value(1) \cmpsign(\value(2)) \value(3)
+
+000D0500
+Else If \value(0): \value(1); Unknown=\value(2), \value(3), & \value(4)
+
+00100200
+\name() (\unhex(\value(0)), \value(1))
+
+00110100
+\name() \unhex(\value(0)):
+
+00120000
+\name():
+
+02000300
+Prioritized Change Action: priority=\value(0), action=\unhex(\value(1)), requirement=\value(2)
+
+02000400
+Prioritized Change Action: priority=\unhex(\value(0)), action=\unhex(\value(1)), requirement=\value(2): \value(3)
+
+02000500
+Prioritized Change Action: priority=\unhex(\value(0)), action=\unhex(\value(1)), requirement=\value(2): \value(3); Unknown=\value(4)
+
+02000600
+Prioritized Change Action: priority=\unhex(\value(0)), action=\unhex(\value(1)), requirement=\value(2): \value(3) \cmpsign(\value(4)) \value(5)
+
+02010200
+\name() action=\unhex(\value(0)), requirement=\value(1)
+
+02010300
+\name() action=\unhex(\value(0)), requirement=\value(1): \value(2)
+
+02010400
+\name(): \value(0): \value(1); Unknown=\value(2)
+
+02010500
+\name() action=\unhex(\value(0)), requirement=\value(1): \value(2) \cmpsign(\value(3)) \value(4)
+
+02040100
+\name() \value(0)
+
+02040200
+\name() \value(0): \value(1)
+
+02040400
+\name() \value(0): \value(1) \cmpsign(\value(2)) \value(3)
+
+001F4960
+\name(): Interrupt=\unhex(\value(0)), Status ID=\unhex(\value(1)), Requirement=\value(2): \value(3)
+
+001F4A28
+\name(): Interrupt=\unhex(\value(0)), Status ID=\unhex(\value(1)), Requirement=\value(2): \value(3) \cmpsign(\value(4)) \value(5)
+
+02060100
+\name(): \unhex(\value(0))
+
+02080100
+\name(): \unhex(\value(0))
+
+02090200
+\name(): Interrupt ID=\enum(\value(0), 0), Status ID=\unhex(\value(1))
+
+020A0100
+\name(): \enum(\value(0), 0)
+
+020B0100
+\name(): \enum(\value(0), 0)
+
+020C0100
+\name(): \enum(\value(0), 0)
+
+04000100
+\name(): sub action=\value(0)
+
+04000200
+\name(): sub action=\value(0), pass frame=\value(1)
+
+04020100
+\name(): \value(0)
+
+04020200
+\name(): \value(0): \value(1)
+
+04020300
+\name(): \value(0): \value(1), \value(2)
+
+04020400
+\name(): \value(0): \value(1) \cmpsign(\value(2)) \value(3)
+
+04030100
+\name(): \value(0)
+
+04030200
+\name(): \value(0): \value(1)
+
+04030300
+\name(): \value(0): \value(1), \value(2)
+
+04030400
+\name(): \value(0): \value(1) \cmpsign(\value(2)) \value(3)
+
+04060100
+\name(): \value(0)
+
+04070100
+\name(): Multiplier=\value(0)x
+
+06000D00
+\name(): Id=\unhex(\half2(\value(0))), Bone=\bone(\half1(\value(0))), Damage=\unhex(\value(1)), ShieldDamage=\unhex(\half1(\value(4))), Direction=\unhex(\value(2)), BaseKnockback=\unhex(\half2(\value(4))), WeightKnockback=\unhex(\half1(\value(3))), KnockbackGrowth=\unhex(\half2(\value(3))), Size=\value(5), Z Offset=\value(6), Y Offset=\value(7), X Offset=\value(8), TripRate=\value(9)%, HitlagMultiplier=x\value(10), SDIMultiplier=x\value(11), Flags=\hex8(\unhex(\value(12)))
+
+06010200
+\name(): ID=\value(0), Damage=\value(1)
+
+06020200
+\name(): ID=\value(1), Size=\value(1)
+
+06030100
+\name(): \value(0)
+
+06050100
+\name(): status=\collision(\value(0))
+
+06080200
+\name(): bone=\bone(\value(0)), status=\collision(\value(1))
+
+060A0800
+\name(): ID=\value(0), Bone=\bone(\value(1)), Scale=\value(2), Offset=(\value(3), \value(4), \value(5)), Action=\unhex(\value(6)), Type=\value(7)
+
+060C0100
+\name(): \value(0)
+
+060E1100
+\name():ID=\value(0), Bone?=\value(1), Damage=\unhex(\value(2)), Direction=\unhex(\value(3)), KnockbackGrowth=\unhex(\value(4)), WeightKnockback=\unhex(\value(5)),BaseKnockback=\unhex(\value(6)), Element=\value(7), UnknownA=\value(8), UnknownB=\value(9), UnknownC=\value(10), UnknownD=\value(11), SFX=\value(12), Direction?=\value(13), UnknownE=\value(14), UnknownF=\value(15), UnknownG=\value(16)
+
+06101100
+\name(): Id=\value(1), Bone=\bone(\value(2)), Size=\value(3), Z Offset=\value(4), Y Offset=\value(5), X Offset=\value(6), Air/Ground=\value(9),Self-Affliction=\value(15)
+
+06150F00
+\name(): Id=\unhex(\half2(\value(0))), Bone=\bone(\half1(\value(0))), Damage=\unhex(\value(1)), ShieldDamage=\unhex(\half1(\value(4))), Direction=\unhex(\value(2)), BaseKnockback=\unhex(\half2(\value(4))), WeightKnockback=\unhex(\half1(\value(3))), KnockbackGrowth=\unhex(\half2(\value(3))), Size=\value(5), Z Offset=\value(6), Y Offset=\value(7), X Offset=\value(8), TripRate=\value(9)%, HitlagMultiplier=x\value(10), SDIMultiplier=x\value(11), Flags=\hex8(\unhex(\value(12)))
+
+08000100
+\name(): \enum(\value(0), 0)
+
+0A000100
+\name(): \value(0)
+
+0A010100
+\name(): \value(0)
+
+0A020100
+\name(): \value(0)
+
+0A090100
+\name(): \value(0)
+
+0A0A0100
+\name(): \value(0)
+
+0B000200
+\name(): Switch=\value(0), Group=\value(1)
+
+0B010200
+\name(): Switch=\value(0), Group=\value(1)
+
+0B020100
+Visible: \value(0)
+
+0C0D0F00
+\name(): Id=\unhex(\half2(\value(0))), Bone=\bone(\half1(\value(0))), Damage=\unhex(\value(1)), ShieldDamage=\unhex(\half1(\value(4))), Direction=\unhex(\value(2)), BaseKnockback=\unhex(\half2(\value(4))), WeightKnockback=\unhex(\half1(\value(3))), KnockbackGrowth=\unhex(\half2(\value(3))), Size=\value(5), Z Offset=\value(6), Y Offset=\value(7), X Offset=\value(8), TripRate=\value(9)%, HitlagMultiplier=x\value(10), SDIMultiplier=x\value(11), Flags=\hex8(\unhex(\value(12)))
+
+0C230200
+\name(): Amount=\value(0), Frames=\value(0)
+
+0C250100
+\name(): \value(0)
+
+0D000200
+\name() (Type \value(0)) @\value(1)
+
+0E000100
+\name(): \airground(\value(0))
+
+0E010200
+\name(): Horizontal Speed=\value(0), Vertical Speed=\value(1)
+
+0E020100
+\name(): \unhex(\value(0))
+
+0E040100
+\name(): \unhex(\value(0))
+
+0E040100
+\name(): \unhex(\value(0))
+
+0E060100
+\name(): \enum(\value(0), 0)
+
+0E080400
+\name(): Horizontal=\value(0), Vertical=\value(1), Add/Set Horiz=\value(2), Add/Set Vert=\value(3)
+
+10000100
+\name(): \value(0)
+
+10030100
+\name(): \value(0)
+
+10040100
+\name(): Model ID=\value(0)
+
+10040200
+\name(): article=\value(0), action=\unhex(\value(1))
+
+10040300
+\name(): article=\value(0), action=\unhex(\value(1)): Delete At End=\value(2)
+
+10050200
+\name(): Article ID=\value(0), Visible=\value(1)
+
+11001000
+\name(): File=\unhex(\half1(\value(0))), Graphic ID=\unhex(\half2(\value(0))), Bone=\bone(\value(1)), Translation=(\value(4), \value(3), \value(2)), Rotation=(\value(7), \value(6), \value(5)), Scale=\value(8), Random Translation=(\value(11), \value(10), \value(9)), Random Rotation=(\value(14), \value(13), \value(12)), Anchored=\value(15)
+
+11010A00
+\name(): File=\unhex(\half1(\value(0))), Graphic ID=\unhex(\half2(\value(0))), Bone=\bone(\value(1)), Translation=(\value(4), \value(3), \value(2)), Rotation=(\value(7), \value(6), \value(5)), Scale=\value(8), Anchored=\value(9)
+
+11020A00
+\name(): File=\unhex(\half1(\value(0))), Graphic ID=\unhex(\half2(\value(0))), Bone=\bone(\value(1)), Translation=(\value(4), \value(3), \value(2)), Rotation=(\value(7), \value(6), \value(5)), Scale=\value(8), Anchored=\value(9)
+
+11031400
+\name(): Hue=\value(0), Length=\value(1), Bone #1=\bone(\value(2)), Translation=(\value(3), \value(4), \value(5)), Bone #2=\bone(\value(6)), Translation=(\value(7), \value(8), \value(9)), State=\value(10), Graphic=\value(11), Bone #3=\bone(\value(12)), Translation=(\value(13), \value(14), \value(15)), Rotation=(\value(16), \value(17), \value(18)), Length=\value(19)
+
+11050100
+\name(): Fade Time=\value(0)
+
+11150300
+\name(): File=\unhex(\half1(\value(0))), Graphic ID=\unhex(\half2(\value(0))), Undefined1=\value(1), Undefined2=\value(2)
+
+11170600
+\name(): ID=\value(0), TransitionTime=\value(1), RGBA=(\value(2), \value(3), \value(4), \value(5))
+
+11170700
+\name(): TransInTime=\value(0), RGBA=(\value(1), \value(2), \value(3), \value(4)), FrameCount=\value(5), TransOutTime=\value(6)
+
+11180200
+\name(): ID=\value(0), TransOutTime=\value(1)
+
+111A1000
+\name(): Graphic=\value(0), Bone=\bone(\value(1)), Translation=(\value(4), \value(3), \value(2)), Rotation=(\value(7), \value(6), \value(5)), Scale=\value(8), Random Translation=(\value(11), \value(10), \value(9)), Random Rotation=(\value(14), \value(13), \value(12)), Anchored=\value(15)
+
+111B1000
+\name(): Graphic=\value(0), Bone=\bone(\value(1)), Translation=(\value(4), \value(3), \value(2)), Rotation=(\value(7), \value(6), \value(5)), Scale=\value(8), Random Translation=(\value(11), \value(10), \value(9)), Random Rotation=(\value(14), \value(13), \value(12)), Anchored=\value(15)
+
+12000200
+\name(): \value(1) = \unhex(\value(0))
+
+12010200
+\name(): \value(1) += \unhex(\value(0))
+
+12020200
+\name(): \value(1) -= \unhex(\value(0))
+
+12030100
+\name(): \value(0)++
+
+12040100
+\name(): \value(0)--
+
+12060200
+\name(): \value(1) = \unhex(\value(0))
+
+12070200
+\name(): \value(1) += \unhex(\value(0))
+
+12080200
+\name(): \value(1) -= \unhex(\value(0))
+
+120A0100
+\name(): \value(0) = true
+
+120B0100
+\name(): \value(0) = false
+
+120F0200
+\name(): \value(1) *= \unhex(\value(0))
+
+12100200
+\name(): \value(1) /= \unhex(\value(0))
+
+1A000100
+\name(): Magnitude=\value(0)
+
+1A030400
+\name(): \value(0) x \value(1) x \value(2); size \value(3)
+
+1A040500
+\name(): Zoom Time=\value(0), Undefined=\value(1), Distance=\value(2), X Rotation=\value(3), Y Rotation=\value(4)
+
+1E000200
+\name(): State=\enum(\value(0), 0), Tolerance=\value(1)
+
+1E030100
+\name(): \value(0)
+
+21010400
+\name(): RGBA=(\value(0), \value(1), \value(2), \value(3))
+
+21020500
+\name(): Transition Time=\value(0), RGBA=(\value(1), \value(2), \value(3), \value(4))
+
+21050600
+\name(): RGBA=(\value(0), \value(1), \value(2), \value(3)), Light Source X=\value(4), Light Source Y=\value(5)
+
+21070500
+\name(): Transition Time=\value(0), RGBA=(\value(1), \value(2), \value(3), \value(4))
+

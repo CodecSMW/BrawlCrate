@@ -1,0 +1,5 @@
+Normal
+Invincible
+Intangible
+Intangible No Flashing
+Intangible Quick Flashing
