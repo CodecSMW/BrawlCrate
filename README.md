@@ -9,33 +9,48 @@ Warning: Most MDef files will not properly save. Do not rely on this fork direct
 Current status:
 
 Features PSAC does not have:
+
   Ability to name subroutines
+  
   Nameable subroutines
+  
   Fighter.pac support
+  
   Ability to sort commands by type.
+  
   Better requirement organization.
+  
   An open source codeset when it should have one.
 
 Fighter.Pac: 
   100% Readadable (including Screen Tint and Flash Overlay support as well as external subroutines)
+  
   100% Compiling (Warning: PM codes exist that directly inject into those files. They need to ALL be removed or ported simultaneously to have a changed pac file work and the heap sized accordingly!)
+  
   Supports renaming actions and subroutines.
 
 Fighter Pac Files:
+
   Most Readable
+  
   Only several compiling. Extra parameters and articles need case-by-case solutions. R.O.B. functional.
   
   Feature Todo: Add ability to add/remove misc properties (i.e. multi-jumps) and action overrides. Assess custom parameter/article potential.
 
 Item Pac Files:
+
   100% Readable
+  
   Not Compiling yet.
   
   Feature Todo: Add ability to add/remove custom hurtboxes and reflectors. Add item parameter override format for ItemEX to use.
   
 Enemy Pac Files:
+
   Needing Case-by-Case solutions due to unknown parameters.
+  
   All bosses readable.
+  
   None compiling yet.
 
 
