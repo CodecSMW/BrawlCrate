@@ -41,7 +41,8 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         [Browsable(false)]
         public string Description =>
-            (Parent as MoveDefEventNode).EventInfo != null &&
+            (Parent as MoveDefEventNode).EventInfo != null && //if one of these is invalid, then it is not present
+            (Parent as MoveDefEventNode).EventInfo.pDescs != null && //in the related text files!
             Index < (Parent as MoveDefEventNode).EventInfo.pDescs.Length
                 ? (Parent as MoveDefEventNode).EventInfo.pDescs[Index]
                 : "No Description Available.";
@@ -527,7 +528,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                         _extNode = e;
                         e._refs.Add(this);
                         Name = e.Name;
-                        action = null;
+                        action = null; //TODO: Sometimes it is NOT 3, such as for the internal references of Fighter.pac!!!
                         list = 3;
                         index = _extNode.Index;
                     }
@@ -569,7 +570,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                     }
                 }
             }
-            else if (RawOffset < 0 && External)
+            else if (External)
             {
                 action = null;
                 index = _extNode.Index;

@@ -2,7 +2,9 @@ using BrawlLib.Internal;
 using BrawlLib.SSBB.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace BrawlLib.SSBB.ResourceNodes
 {
@@ -59,30 +61,38 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         [Category("Data Offsets")] public int Unk22 => Header->Unknown22;
 
-        [Category("Data Offsets")] public int Unk23 => Header->Unknown23;
+        /*[Category("Data Offsets")] public int Unk23 => Header->Unknown23;
 
         [Category("Data Offsets")] public int Unk24 => Header->Unknown24;
 
-        [Category("Data Offsets")] public int Unk25 => Header->Unknown25;
+        [Category("Data Offsets")] public int Unk25 => Header->Unknown25;*/
 
         [Category("Special Offsets Node")] public SpecialOffset[] Offsets => specialOffsets.ToArray();
 
+        public MoveDefActionListNode actions;
+        public MoveDefCommonUnk7ListNode node_7;
+        public MoveDefUnk11Node node_11;
+        public MoveDefCommonUnk21Node node_21;
+        public MoveDefParamListNode node_22;
+        public MoveDefSectionParamNode[] ambigNode;
         public MoveDefDataCommonNode(uint dataLen, string name)
         {
             DataLen = dataLen;
             _name = name;
         }
 
-        public MoveDefActionsSkipNode _flashOverlay, _screenTint;
+        public MoveDefActionsSkipNode _hitOverlay, _flashOverlay, _screenTint;
 
         public override bool OnInitialize()
         {
             base.OnInitialize();
             bint* current = (bint*) Header;
-            for (int i = 0; i < 25; i++)
+            for (int i = 0; i < 23; i++)
             {
                 specialOffsets.Add(new SpecialOffset {Index = i, Offset = *current++});
             }
+            specialOffsets.Add(new SpecialOffset { Index = 23, Offset = 0 });
+
 
             CalculateDataLen();
 
@@ -91,15 +101,26 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public VoidPtr dataHeaderAddr;
 
+        public int
+            part1Len = 0,
+            part2Len = 0,
+            part3Len = 0,
+            part4Len = 0,
+            part5Len = 0,
+            part6Len = 0,
+            part7Len = 0,
+            part8Len = 0;
+
         public override void OnPopulate()
         {
             #region Populate
 
-            if (RootNode is ARCNode && (RootNode as ARCNode).IsFighter)
+            //if (RootNode is ARCNode && (RootNode as ARCNode).IsFighter)
+            if (Name == "dataCommon")
             {
                 List<int> ActionOffsets;
 
-                MoveDefActionListNode actions = new MoveDefActionListNode {_name = "Action Scripts", _parent = this};
+                actions = new MoveDefActionListNode {_name = "Action Scripts", _parent = this};
 
                 bint* actionOffset;
 
@@ -115,42 +136,54 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                     actions.ActionOffsets.Add(ActionOffsets);
                 }
-
+                
                 //unk18 == ColorF4
 
                 int r = 0;
+                ambigNode = new MoveDefSectionParamNode[24]; //Won't use all of these but do not care.
                 foreach (SpecialOffset s in specialOffsets)
                 {
-                    if (r != 4 && r != 5 && r != 6 && r != 7 && r != 11 && r != 17 && r != 19 && r != 20 && r != 21 &&
-                        r != 22 && r != 23)
+                    //if (r != 4 && r != 5 && r != 6 && r != 7 && 
+                    //    r != 11 && r != 17 && 
+                    //   r != 19 && r != 20 && r != 21 && r != 22)
+                    if (r < 4 || r == 23 || (r < 19 && r > 7 && r != 11))
                     {
-                        string name = "Params" + r;
+                        string name = "Params " + r;
+                        ambigNode[r] = new MoveDefSectionParamNode { _name = name, offsetID = r };
                         if (r < 4)
                         {
                             name = (r == 0 || r == 2 ? "" : "SSE ") + (r < 2 ? "Global " : "") + "IC-Basics";
+                            ambigNode[r]._name = name;
+                            ambigNode[r].offsetID = r;
                         }
-
-                        new MoveDefSectionParamNode {_name = name, offsetID = r}.Initialize(this,
-                            BaseAddress + s.Offset, 0);
+                        ambigNode[r].Initialize(this, BaseAddress + s.Offset, s.Size);
+                        if (r == 9 || r == 17) // itemSwingData (9), patternPowerMul (17)
+                        {
+                            Dictionary<NameSizeGroup, FDefStringEntry> dTbl = (Parent as MoveDefSectionNode).DataTable;
+                            foreach (KeyValuePair<NameSizeGroup, FDefStringEntry> data in dTbl)
+                            {
+                                if (data.Value._dataOffset == s.Offset)
+                                {
+                                    ambigNode[r]._name = data.Key.Name; //Tested. Confirmed functional. 
+                                }
+                            }
+                            ambigNode[r].RefreshSectionDesc(); //Allows BrawlCrate to show descriptions for these two.
+                        }
                     }
 
                     r++;
                 }
 
-                //Copy list of offset 19?
-                //if (specialOffsets[6].Size != 0)
-                //    new MoveDefActionsNode("Flash Overlay Actions") { offsetID = 6 }.Initialize(this, BaseAddress + specialOffsets[6].Offset, 0);
-
                 if (specialOffsets[7].Size != 0)
                 {
-                    new MoveDefCommonUnk7ListNode {_name = "Unknown7", offsetID = 7}.Initialize(this,
-                        BaseAddress + specialOffsets[7].Offset, 0);
+                    node_7 = new MoveDefCommonUnk7ListNode { _name = "Unknown7", offsetID = 7 };
+                    node_7.Initialize(this, BaseAddress + specialOffsets[7].Offset, 48); //TODO: This one's size is bruteforced, we still don't know what Unk7 is for!
                 }
 
                 if (specialOffsets[11].Size != 0)
                 {
-                    new MoveDefUnk11Node {_name = "Unknown11", offsetID = 11}.Initialize(this,
-                        BaseAddress + specialOffsets[11].Offset, 0);
+                    node_11 = new MoveDefUnk11Node { _name = "Unknown11", offsetID = 11 };
+                    node_11.Initialize(this, BaseAddress + specialOffsets[11].Offset, 0);
                 }
 
                 if (specialOffsets[19].Size != 0)
@@ -164,31 +197,26 @@ namespace BrawlLib.SSBB.ResourceNodes
                     (_screenTint = new MoveDefActionsSkipNode("Screen Tint Actions") {offsetID = 20}).Initialize(this,
                         BaseAddress + specialOffsets[20].Offset, 0);
                 }
-
+                /*
+                 //Test viewer to observe table. Normally uses same pointers as 19 so okay to keep hidden. Compilation accounts for this.
+                if (specialOffsets[6].Size != 0)
+                {
+                    MoveDefRawDataNode hitOver;
+                    (hitOver = new MoveDefRawDataNode("Hit Overlay Actions") { offsetID = 6 }).Initialize(
+                        this, BaseAddress + specialOffsets[6].Offset, 168); //TODO: Make it so 0 naturally works instead of forcing 21 * 8!
+                }
+                */
                 if (specialOffsets[21].Size != 0)
                 {
-                    new MoveDefCommonUnk21Node {offsetID = 21}.Initialize(this,
-                        BaseAddress + specialOffsets[21].Offset, 0);
+                    node_21 = new MoveDefCommonUnk21Node { offsetID = 21 };
+                    node_21.Initialize(this, BaseAddress + specialOffsets[21].Offset, 16);
                 }
 
                 if (specialOffsets[22].Size != 0)
                 {
-                    new MoveDefParamListNode {_name = "Unknown22", offsetID = 22}.Initialize(this,
-                        BaseAddress + specialOffsets[22].Offset, 0);
+                    node_22 = new MoveDefParamListNode { _name = "Unknown22", offsetID = 22 };
+                    node_22.Initialize(this, BaseAddress + specialOffsets[22].Offset, 0);
                 }
-
-                if (specialOffsets[23].Size != 0)
-                {
-                    new MoveDefParamsOffsetNode {_name = "Unknown23", offsetID = 23}.Initialize(this,
-                        BaseAddress + specialOffsets[23].Offset, 0);
-                }
-
-                if (specialOffsets[17].Size != 0)
-                {
-                    new MoveDefPatternPowerMulNode {_name = "Unknown17", offsetID = 17}.Initialize(this,
-                        BaseAddress + specialOffsets[17].Offset, 0);
-                }
-
                 if (specialOffsets[4].Size != 0 || specialOffsets[5].Size != 0)
                 {
                     int count;
@@ -207,7 +235,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                     //Set up groups
                     for (int i = 0; i < count; i++)
                     {
-                        actions.AddChild(new MoveDefActionGroupNode {_name = "Action" + i}, false);
+                        actions.AddChild(new MoveDefActionGroupNode {_name = "Action " + System.Convert.ToString(i, 16).ToUpper()}, false);
                     }
 
                     //Add children
@@ -215,11 +243,17 @@ namespace BrawlLib.SSBB.ResourceNodes
                     {
                         if (specialOffsets[i + 4].Size != 0)
                         {
+                            //TODO: Fix Reading!
                             PopulateActionGroup(actions, actions.ActionOffsets[i], false, i);
                         }
                     }
 
                     //Add to children (because the parent was set before initialization)
+
+                    //TODO
+
+                    //MovesetCmnConverter.CalcDataSize(this);
+
                     Children.Add(actions);
 
                     Root._actions = actions;
@@ -234,8 +268,10 @@ namespace BrawlLib.SSBB.ResourceNodes
         private void CalculateDataLen()
         {
             List<SpecialOffset> sorted = specialOffsets.OrderBy(x => x.Offset).ToList();
-            for (int i = 0; i < sorted.Count; i++)
-            {
+            for (int i = 0; i <= 23; i++) //24 and 25 are within others!
+            { //TODO: Gut out specialOffsets 24 and 25, they're lookup offsets!
+                //TODO: figure out how to  calculate size of 22!
+                //TODO: Force size of 0xA8 for 0
                 if (i < sorted.Count - 1)
                 {
                     sorted[i].Size = (int) (sorted[i + 1].Offset - sorted[i].Offset);
@@ -247,7 +283,27 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                 //Console.WriteLine(sorted[i].ToString());
             }
+            //TODO: offset 23 needs to have parts of unk7 removed from calculations!
+            specialOffsets[23].Size = 0xA8;
+            specialOffsets[17].Size = 0x28;
+            specialOffsets[3].Size = 0x8A0;
+            if (specialOffsets[6].Size > 0x800)
+                specialOffsets[6].Size = 148;
         }
+        //TODO: FIX COMPILATION OF FIGHTER.PAC!!!!
+
+        public override int OnCalculateSize(bool force)
+        {
+            _entryLength = 124;// 124;
+            _childLength = MovesetCmnConverter.CalcDataSize(this);
+            return _entryLength + _childLength;
+        } //TODO: Make accurate!
+        
+        public override void OnRebuild(VoidPtr address, int length, bool force)
+        {
+            MovesetCmnConverter.BuildData(this, (CommonMovesetHeader*)dataHeaderAddr, address, length, force);
+        }
+        
 
         public void PopulateActionGroup(ResourceNode g, List<int> ActionOffsets, bool subactions, int index)
         {
@@ -323,7 +379,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override bool OnInitialize()
         {
-            _name = "Leg Bones";
+            _name = "IK Leg Bones";
             base.OnInitialize();
             return DataOffset1 > 0 || DataOffset2 > 0;
         }
@@ -332,14 +388,14 @@ namespace BrawlLib.SSBB.ResourceNodes
         {
             if (DataOffset1 > 0)
             {
-                new MoveDefRawDataNode("Left") {offsetID = 0}.Initialize(this, BaseAddress + DataOffset1, 0);
+                new MoveDefRawDataNode("Left") {offsetID = 0}.Initialize(this, BaseAddress + DataOffset1, 16);
             }
 
             if (DataOffset2 > 0)
             {
-                new MoveDefRawDataNode("Right") {offsetID = 1}.Initialize(this, BaseAddress + DataOffset2, 0);
+                new MoveDefRawDataNode("Right") {offsetID = 1}.Initialize(this, BaseAddress + DataOffset2, 16);
             }
-
+            
             foreach (MoveDefRawDataNode d in Children)
             {
                 bint* addr = (bint*) d.Header;
@@ -348,45 +404,66 @@ namespace BrawlLib.SSBB.ResourceNodes
                     new MoveDefRawDataNode(new string((sbyte*) (BaseAddress + addr[i]))).Initialize(d, d.Header + i * 4,
                         4);
                 }
+                foreach (MoveDefRawDataNode e in d.Children)
+                {
+                    bint* addr2 = (bint*)e.Header;
+                    new MoveDefRawDataNode("data").Initialize(e, BaseAddress + addr2->Value, 8);
+                }
             }
+        }
+        public override void OnRebuild(VoidPtr address, int length, bool force)
+        {
+            _entryOffset = address;
+            int* data = (int*)address;
+            int* addr = data;
+            int* tableAddr = data + 12;
+            byte* tableChr = (byte*)(address + 0x30);
+            FDefCommonUnk7Entry* header = (FDefCommonUnk7Entry*)address;
+            //Header
+            *data++ = (bint)(address - _rebuildBase + 0x10).Reverse(); //4 ints so 0x10 # !! = Needs Lookup
+            _lookupOffsets.Add(address - (int)_rebuildBase); //4 lookups
+            *data++ = (bint)Count1.Reverse();
+            *data++ = (bint)(address - _rebuildBase + 0x20).Reverse(); //8 ints so 0x20 # !! Needs Lookup
+            _lookupOffsets.Add(address - (int)_rebuildBase + 8); //4 lookups
+            *data++ = (bint)Count2.Reverse();
+            //Left Leg
+            for (int i = 0; i < 8; i++) // All need lookups
+            {
+                *data++ = (bint)(address - _rebuildBase + i * 8 + 0x30).Reverse();
+                _lookupOffsets.Add(address - (int)(_rebuildBase) + i * 4 + 0x10); //4 lookups
+            }
+            for (int i = 0; i < 2; i++) // I probably should just make a table of the expected strings..... but this works so oh well.
+                for (int j = 0; j < 4; j++)
+                    foreach (MoveDefRawDataNode raw in Children[i].Children[j].Children)
+                        for (int k = 0; k < 8; k++) //L/R LegJ, KneeJ, FootJ, ToeN
+                            *tableChr++ = raw.data[k];
+
+            
+
+            
         }
 
         public override int OnCalculateSize(bool force)
         {
             _lookupCount = Children.Count;
-            int size = 24;
-            foreach (MoveDefHitDataListNode p in Children)
+            int size = 0x10;
+            foreach (MoveDefRawDataNode p in Children) // Left & Right
             {
-                if (!p.External)
+                size += 0x10;
+                foreach (MoveDefRawDataNode q in p.Children) //LegJ, KneeJ, FootJ, ToeN 
                 {
-                    size += p.CalculateSize(true);
+                    _lookupCount++;
+                    size += 12; //4 for pointer, 8 for string
                 }
             }
 
             return size;
         }
+    }
+    public unsafe class MoveDefCommomnUnk21EntryNode : MoveDefEntryNode
+    {
 
-        public override void OnRebuild(VoidPtr address, int length, bool force)
-        {
-            VoidPtr addr = address;
-            foreach (MoveDefHitDataListNode p in Children)
-            {
-                if (!p.External)
-                {
-                    p.Rebuild(addr, p._calcSize, true);
-                    addr += p._calcSize;
-                }
-            }
 
-            _entryOffset = addr;
-            FDefListOffset* header = (FDefListOffset*) addr;
-            foreach (MoveDefHitDataListNode d in Children)
-            {
-                (&header[d.offsetID])->_listCount = d.Children.Count;
-                (&header[d.offsetID])->_startOffset = (int) d._entryOffset - (int) _rebuildBase;
-                _lookupOffsets.Add((&header[d.offsetID])->_startOffset.Address - (int) _rebuildBase);
-            }
-        }
     }
 
     public unsafe class MoveDefCommonUnk7ListNode : MoveDefEntryNode
@@ -401,7 +478,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void OnPopulate()
         {
-            for (int i = 0; i < Size / 12; i++)
+            for (int i = 0; i < 4; i++) //Only 4 entries. Please keep it that way.
             {
                 new MoveDefCommonUnk7EntryNode {_extOverride = true}.Initialize(this, First + i, 12);
             }
@@ -410,16 +487,33 @@ namespace BrawlLib.SSBB.ResourceNodes
         public override int OnCalculateSize(bool force)
         {
             _lookupCount = 0;
-            return _entryLength = 12 * Children.Count;
+            int size = 0;
+            foreach (MoveDefCommonUnk7EntryNode h in Children)
+            {
+                size += h.OnCalculateSize(true);
+                _lookupCount += h._lookupCount;
+            };
+            return _entryLength = size;
         }
 
         public override void OnRebuild(VoidPtr address, int length, bool force)
         {
             _entryOffset = address;
             FDefCommonUnk7Entry* data = (FDefCommonUnk7Entry*) address;
+            float* tblData = (float*)(address + 0x30);
             foreach (MoveDefCommonUnk7EntryNode h in Children)
             {
+                data->_list._startOffset = tblData - (Parent as MoveDefDataCommonNode)._rebuildBase;
+                _lookupOffsets.Add((int)data->_list._startOffset.Address - (int)_rebuildBase); //4 lookups
                 h.Rebuild(data++, 12, true);
+                foreach (MoveDefCommonUnk7EntryListEntryNode d in h.Children)
+                {
+                    bfloat temp = 0;
+                    temp = d.unk1._data;
+                    *tblData++ = temp;
+                    temp = d.unk2._data;
+                    *tblData++ = temp;
+                }
             }
         }
     }
@@ -479,33 +573,37 @@ namespace BrawlLib.SSBB.ResourceNodes
             for (int i = 0; i < Count; i++)
             {
                 new MoveDefCommonUnk7EntryListEntryNode {_name = "Entry" + i}.Initialize(this,
-                    BaseAddress + DataOffset + i * 8, 8);
+                   BaseAddress + DataOffset + i * 8, 8);
             }
         }
 
         public override int OnCalculateSize(bool force)
         {
-            _lookupCount = 0;
-            return 12;
+            _lookupCount = 1; //1 for each of the 4 entries
+            int size = 12; // base
+            foreach (MoveDefSectionParamNode e in Children)
+            {
+                size += 8;
+            }
+            return size;
         }
 
-        public override void OnRebuild(VoidPtr address, int length, bool force)
+        public override void Rebuild(VoidPtr address, int length, bool force)
         {
             _entryOffset = address;
-            FDefCommonUnk7Entry* data = (FDefCommonUnk7Entry*) address;
-            data->_list._startOffset = unk1;
+            FDefCommonUnk7Entry* data = (FDefCommonUnk7Entry*) address; 
             data->_list._listCount = Children.Count;
             data->_unk3 = unk3;
             data->_unk4 = unk4;
         }
     }
 
-    public unsafe class MoveDefCommonUnk7EntryListEntryNode : MoveDefEntryNode
+    public unsafe class MoveDefCommonUnk7EntryListEntryNode : MoveDefSectionParamNode
     {
         internal FDefCommonUnk7EntryListEntry* Header => (FDefCommonUnk7EntryListEntry*) WorkingUncompressed.Address;
         public override ResourceType ResourceFileType => ResourceType.Unknown;
 
-        public float unk1, unk2;
+        public bfloat unk1, unk2;
 
         [Category("Unknown 7 Entry")]
         public float Unknown1
@@ -587,9 +685,10 @@ namespace BrawlLib.SSBB.ResourceNodes
             _lookupCount = Children.Count > 0 ? 1 : 0;
             _entryLength = 8;
             _childLength = 0;
-            foreach (MoveDefSectionParamNode p in Children)
+            foreach (MoveDefUnk11EntryNode p in Children)
             {
                 _childLength += p.CalculateSize(true);
+                _lookupCount += p._lookupCount;
             }
 
             return _entryLength + _childLength;
@@ -598,21 +697,32 @@ namespace BrawlLib.SSBB.ResourceNodes
         public override void OnRebuild(VoidPtr address, int length, bool force)
         {
             VoidPtr addr = address;
-            foreach (MoveDefSectionParamNode p in Children)
-            {
-                p.Rebuild(addr, p._calcSize, true);
-                addr += p._calcSize;
-            }
 
             _entryOffset = addr;
             FDefListOffset* header = (FDefListOffset*) addr;
+            header->_listCount = Children.Count;
             if (Children.Count > 0)
             {
-                header->_startOffset = (int) address - (int) _rebuildBase;
-                _lookupOffsets.Add((int) header->_startOffset.Address - (int) _rebuildBase);
+                header->_startOffset = (int)( address - _rebuildBase + 8);
+                _lookupOffsets.Add(address - (int) _rebuildBase); //1 + 2
+                int* data = (int*)(address + 8);
+                float* tblData = (float*)(address + 0x20); //2 sets of 12-byte parameters before the tables
+                
+                foreach (MoveDefUnk11EntryNode e in Children)
+                {
+                    _lookupOffsets.Add((int)(data - _rebuildBase + 4)); //It's the second word, not first!
+                    *data++ = (bint)e.Unknown.Reverse();
+                    *data++ = (bint)(tblData - _rebuildBase).Reverse(); //We will set up the table immediately after the two sets of entries
+                    *data++ = (bint)e.Count.Reverse();
+                    e.Children[0].Rebuild(tblData, e.Count * 4, true); //Section Parameter
+                    tblData += e.Count;
+                }
             }
 
-            header->_listCount = Children.Count;
+            
+
+            _entryOffset = address;
+
         }
     }
 
@@ -645,10 +755,26 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void OnPopulate()
         {
+            /*
             for (int i = 0; i < Count; i++)
             {
                 new MoveDefIndexNode {_name = "Index" + i}.Initialize(this, BaseAddress + DataOffset + i * 4, 4);
             }
+            */
+            new MoveDefSectionParamNode { _name = "Data" }.Initialize(this, BaseAddress + DataOffset, Count * 4);
+        }
+        public override int OnCalculateSize(bool force)
+        {
+            _lookupCount = 1;
+            _entryLength = 12;
+            _childLength = 0;
+            foreach (MoveDefSectionParamNode p in Children)
+            {
+                _childLength += p.CalculateSize(true);
+                _lookupCount += p._lookupCount;
+            }
+
+            return _entryLength + _childLength;
         }
     }
 
@@ -667,11 +793,23 @@ namespace BrawlLib.SSBB.ResourceNodes
         public override bool OnInitialize()
         {
             base.OnInitialize();
-            for (int i = 0; i < WorkingUncompressed.Length / 8; i++)
+            if (Name != "Hit Overlay Actions")
             {
-                ActionOffsets.Add(Header[i * 2]);
-                Flags.Add(Header[i * 2 + 1]);
+                for (int i = 0; i < WorkingUncompressed.Length / 8; i++)
+                {
+                    ActionOffsets.Add(Header[i * 2]);
+                    Flags.Add(Header[i * 2 + 1]);
+                }
             }
+            else
+            {
+                for (int i = 0; i < WorkingUncompressed.Length / 4; i++)
+                {
+                    ActionOffsets.Add(Header[i]);
+                    Flags.Add(Header[i]);
+                }
+            }
+
 
             return true;
         }
@@ -693,6 +831,21 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                 i++;
             }
+        }
+        public override int OnCalculateSize(bool force)
+        {
+            int size = Children.Count * 8;
+            _lookupCount = Children.Count;
+            if (force)  //toggle for command data to be included for ease of debugging
+            {
+                foreach (MoveDefCommonActionNode c in Children)
+                {
+                    size += c.OnCalculateSize(true);
+                    _lookupCount += c._lookupCount;
+                }
+            }
+
+            return size;
         }
     }
 
@@ -768,5 +921,52 @@ namespace BrawlLib.SSBB.ResourceNodes
             _unk3 = (byte) ((flags >> 8) & 0xFF);
             _unk4 = (byte) ((flags >> 0) & 0xFF);
         }
+        /*
+         
+        Notes:
+            Flash Overlay Actions:
+                Unk1 is 0 for all
+                Flags:
+                    Action 0
+                        0001 1110
+                    Action 1-19, 21-22, 24-25, 33-35, 37-38
+                        0110 0100
+                    Action 20
+                        0000 1100
+                    Action 23
+                        1001 0110
+                    Action 26, 39-40
+                        0000 1010
+                    Action 27-30, 36
+                        0011 1100
+                    Action 31
+                        0000 1111
+                    Action 32
+                        0000 1011
+                Unk3:
+                   Action 0-27, 30-32, 35-40
+                        0
+                   Action 28-29, 33-34
+                        1
+                Unk4:
+                   Action 0-25, 27-36
+                        0
+                   Action 26, 37-40
+                        1
+            
+            Hit Overlay Actions:
+                Unk1, Flags are 0 for all
+                Unk2, Unk3 vary wildly
+            Screen Tint Actions:
+                Unk1, Unk3 and Unk4 are 0 for all
+                Flags:
+                    Action 0-7
+                        0011 0010
+                    Action 8, 10-12
+                        0111 1111
+                    Action 9
+                        0111 1110
+          
+        */
     }
 }

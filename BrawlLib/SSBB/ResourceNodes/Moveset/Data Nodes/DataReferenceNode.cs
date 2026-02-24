@@ -63,15 +63,24 @@ namespace BrawlLib.SSBB.ResourceNodes
             _offsets = new List<int>();
             _offsets.Add(_offset);
             int offset = *Header;
-            while (offset > 0)
+            if (_offset >= 0) //Sometimes "offset" is garbage when _offset is -1. -1 indicates no data.
             {
-                _offsets.Add(offset);
-                offset = *(bint*) (BaseAddress + offset);
-                if (_offsets.Contains(offset))
+                while (offset > 0)
                 {
-                    break;
+                    _offsets.Add(offset);
+                    offset = *(bint*)(BaseAddress + offset);
+                    if (_offsets.Contains(offset))
+                    {
+                        break;
+                    }
                 }
             }
+            else //TODO: breakpoint for checking disabled action commands. Clean up later.
+            {   //Example to test for: PM Lucas statusAnimCmd_AirLasso
+                return false;
+            } //The cause of this error is from removing the action command without
+              //removing its node name, leaving it unreferenced. Confusing BrawlCrate but
+              //not particularly affecting Brawl itself.
 
             //_offsets.Add(offset);
             //Root._externalRefs.Add(this);

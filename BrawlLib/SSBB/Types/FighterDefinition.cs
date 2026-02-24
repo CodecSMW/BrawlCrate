@@ -1,4 +1,5 @@
 ﻿using BrawlLib.Internal;
+using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace BrawlLib.SSBB.Types
@@ -80,46 +81,48 @@ namespace BrawlLib.SSBB.Types
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct MovesetHeader
     {
-        public const int Size = 0x8C;
+        public const int Size = 0x19C; //8C, Not 7C?
 
-        public bint SubactionFlagsStart;
+        public bint SubactionFlagsStart;    //0x00
         public bint ModelVisibilityStart;
         public bint AttributeStart;
         public bint SSEAttributeStart;
 
-        public bint MiscSectionOffset;
+        public bint MiscSectionOffset;      //0x10
         public bint CommonActionFlagsStart;
         public bint ActionFlagsStart;
-        public bint Unknown7;
+        public bint Unknown7; //Extra Action Flags
 
-        public bint ActionInterrupts;
+        public bint ActionInterrupts;       //0x20
         public bint EntryActionsStart;
         public bint ExitActionsStart;
         public bint ActionPreStart;
 
-        public bint SubactionMainStart;
+        public bint SubactionMainStart;     //0x30
         public bint SubactionGFXStart;
         public bint SubactionSFXStart;
         public bint SubactionOtherStart;
 
-        public bint BoneFloats1;
+        public bint BoneFloats1;            //0x40
         public bint BoneFloats2;
         public bint BoneRef1;
         public bint BoneRef2;
 
-        public bint EntryActionOverrides;
+        public bint EntryActionOverrides;   //0x50
         public bint ExitActionOverrides;
         public bint Unknown22;
         public bint BoneFloats3;
 
-        public bint Unknown24;
+        public bint Unknown24;              //0x60
         public bint StaticArticlesStart;
         public bint EntryArticleStart;
 
-        public bint Unknown27;
+        public bint Unknown27; //Data Flags 0   //0x6C
         public bint Unknown28;
         public buint Flags1;
-        public bint Flags2; //Sometimes -1
+        public bint Flags2; //Sometimes -1, Data Flags 3
+
+        public fixed int Extras[68]; //Don't worry, most of this padding will be discarded if unused due to a size check.
 
         public VoidPtr Address
         {
@@ -136,32 +139,41 @@ namespace BrawlLib.SSBB.Types
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct CommonMovesetHeader
     {
-        public bint Unknown0;
-        public bint Unknown1;
-        public bint Unknown2;
-        public bint Unknown3;
-        public bint ActionsStart;
-        public bint Actions2Start;
-        public bint Unknown6;
-        public bint Unknown7;
-        public bint Unknown8;
-        public bint Unknown9;
-        public bint Unknown10;
-        public bint Unknown11;
-        public bint Unknown12;
-        public bint Unknown13;
-        public bint Unknown14;
-        public bint Unknown15;
-        public bint Unknown16;
-        public bint Unknown17;
-        public bint Unknown18;
-        public bint Unknown19;
-        public bint Unknown20;
-        public bint Unknown21;
-        public bint Unknown22;
-        public bint Unknown23;
-        public bint Unknown24;
-        public bint Unknown25;
+        public const int Size = 0x5C; //Not 68?
+
+        public bint Unknown0; //GlobalICBasics      //47 entries (size: 0xBC)
+        public bint Unknown1; //GlobalICBasicsSSE   //47 entries (size: 0xBC)
+        public bint Unknown2; //ICBasics            //227 entries (size: 0x89C) Is this really one less??? This is right.
+        public bint Unknown3; //ICBasicsSSE         //228 entries (size: 0x8A0)
+
+        public bint ActionsStart;  //Enter Actions
+        public bint Actions2Start; //Exit Actions
+        public bint Unknown6;      //Hit Overlays
+        public bint Unknown7;   //UNK. complex size!
+
+        public bint Unknown8; //list of 105 float entries (size 0x1A4)
+        public bint Unknown9; //itemSwingData       //19 entries (size: 0x64)
+        public bint Unknown10; //list of 4 float entries (size: 0x10)
+        public bint Unknown11; //UNK. Complex!
+
+        public bint Unknown12; //list of 32 floats (size: 0x80)
+        public bint Unknown13; //list of 32 floats (size: 0x80)
+        public bint Unknown14; //list of 16 floats (size: 0x40)
+        public bint Unknown15; //list of 9 floats (size: 0x24)
+
+        public bint Unknown16; //list of 18 float and int entries (size of 0x48)
+        public bint Unknown17; //patternPowerMul    //10 floats + 4 Action Nodes: Item Throw F, B, Hi, Lo
+
+        public bint Unknown18; //RGBAColor?
+        public bint Unknown19; //Flash Overlays
+        public bint Unknown20; //Screen Tints
+        public bint Unknown21; //Leg Bone Names
+
+        public bint Unknown22; //UNK Leg info. Complex!
+        //public bint Unknown23; //pointer to param block of 42 floats, block pointed size: 0xA8
+                                //but this is not real. That block is at the start (0x00)
+        //public bint Unknown24; //Not real
+        //public bint Unknown25; //Not real
 
         public VoidPtr Address
         {
@@ -173,47 +185,6 @@ namespace BrawlLib.SSBB.Types
                 }
             }
         }
-    }
-
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct patternPowerMul
-    {
-        public bfloat _unk1;
-        public bfloat _unk2;
-        public bfloat _unk3;
-        public bfloat _unk4;
-
-        public bfloat _unk5;
-        public bfloat _unk6;
-        public bfloat _unk7;
-        public bfloat _unk8;
-
-        public bfloat _unk9;
-        public bfloat _unk10;
-
-        //Four action nodes in a row start here
-        public byte _first;
-
-        public VoidPtr Address
-        {
-            get
-            {
-                fixed (void* ptr = &this)
-                {
-                    return ptr;
-                }
-            }
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct patternPowerMulEntry
-    {
-        public FDefEvent _event1;
-        public FDefEvent _event2;
-        public bint _pad1;
-        public bint _pad2;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -269,6 +240,49 @@ namespace BrawlLib.SSBB.Types
             }
         }
     }
+    public unsafe struct EnemyMovesetHeader
+    {
+        public bint Unknown0;
+        public bint Unknown1;
+        public bint Unknown2;
+        public bint Unknown3;
+        public bint Unknown4;
+        public bint Unknown5;
+        public bint Unknown6;
+        public bint Unknown7;
+        public bint Unknown8;
+        public bint Unknown9;
+        public bint Unknown10;
+        public bint Unknown11;
+        public bint Unknown12;
+        public bint Unknown13;
+        public bint Unknown14;
+        public bint Unknown15;
+        public bint Unknown16;
+        public bint Unknown17;
+        public bint Unknown18;
+        public bint Unknown19;
+        public bint Unknown20;
+        public bint Unknown21;
+        public bint Unknown22;
+        public bint Unknown23;
+        public bint Unknown24;
+        public bint Unknown25;
+        public bint Unknown26;
+        public bint Unknown27;
+
+        public VoidPtr Address
+        {
+            get
+            {
+                fixed (void* ptr = &this)
+                {
+                    return ptr;
+                }
+            }
+        }
+    }
+
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct FDefCommonUnk7Entry

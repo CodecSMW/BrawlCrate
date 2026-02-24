@@ -432,12 +432,6 @@ namespace BrawlLib.Internal
         }
     }
 
-    public class SectionParamInfo
-    {
-        public string _newName;
-        public List<AttributeInfo> _attributes;
-    }
-
     public enum HitboxType
     {
         Typeless,

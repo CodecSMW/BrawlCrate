@@ -1,5 +1,6 @@
 ﻿using BrawlLib.Internal;
 using BrawlLib.SSBB.Types;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -152,7 +153,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         public override bool OnInitialize()
         {
             base.OnInitialize();
-            _name = "Action" + (Index + (Parent.Name == "Action Flags" ? 274 : 0));
+            _name = "Action " + Convert.ToString((Index + (Parent.Name == "Action Flags" ? 274 : 0)), 16).ToUpper();
             flags1 = Header->_flags1;
             flags2 = Header->_flags2;
             flags3 = Header->_flags3;

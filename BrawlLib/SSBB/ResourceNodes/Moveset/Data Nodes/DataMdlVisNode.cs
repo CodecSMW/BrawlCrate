@@ -33,9 +33,12 @@ namespace BrawlLib.SSBB.ResourceNodes
             VoidPtr entries = BaseAddress + EntryOffset;
             VoidPtr defaults = BaseAddress + DefaultsOffset;
 
-            for (int i = 0;
-                i < (EntryOffset == 0 ? 0 : ((DefaultsOffset == 0 ? _offset : DefaultsOffset) - EntryOffset) / 4);
-                i++)
+            int RefCount = EntryCount == 0 ? 0 : 1;
+            if (Parent is MoveDefDataNode) //MoveDefArticleNode can call this but 
+                                           //is not as complex!
+                RefCount *= 2;
+            
+            for (int i = 0; i < RefCount; i++)
             {
                 MoveDefModelVisRefNode offset;
                 (offset = new MoveDefModelVisRefNode {_name = "Reference" + (i + 1)}).Initialize(this,
@@ -79,7 +82,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                 for (int i = 0; i < DefaultsCount; i++)
                 {
                     FDefModelDisplayDefaults* def = (FDefModelDisplayDefaults*) (defaults + i * 8);
-                    for (int x = 0; x < ((DefaultsOffset == 0 ? _offset : DefaultsOffset) - EntryOffset) / 4; x++)
+                    for (int x = 0; x < RefCount; x++)
                     {
                         if (Children[x].Children.Count > 0)
                         {
@@ -183,7 +186,10 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             _lookupOffsets.Add((int) header->_entryOffset.Address - (int) _rebuildBase);
 
-            header->_entryCount = Children[0].Children.Count; //Children 1 child count will be the same
+           //TODO: Buggy when DefaultVisibility is involved!
+           header->_entryCount = Children[0].Children.Count; //Children 1 child count will be the same
+
+            
 
             int defCount = 0;
             foreach (MoveDefModelVisRefNode r in Children)
@@ -201,7 +207,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                     b._entryOffset = switchLists;
                     if (b.defaultGroup >= 0)
                     {
-                        defCount++;
+                        defCount = 1;
                         defaults->_switchIndex = b.Index;
                         (defaults++)->_defaultGroup = b.defaultGroup;
                     }
@@ -242,7 +248,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                 }
             }
 
-            if (defCount > 0)
+            if (defCount > 0) //TODO: This function gets run twice! Fix the article's call!
             {
                 header->_defaultsOffset = (int) offsets - (int) _rebuildBase;
                 _lookupOffsets.Add((int) header->_defaultsOffset.Address - (int) _rebuildBase);

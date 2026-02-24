@@ -3,12 +3,16 @@ using BrawlLib.SSBB.Types;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace BrawlLib.Internal.Windows.Forms.Moveset
 {
     public class EventModifier : UserControl
     {
+        public bool parentDesignMode = true;
+
+        private int iReq9999loc;
         private ComboBox cboType;
         private ListBox lstParameters;
         private Button btnChangeEvent;
@@ -40,384 +44,390 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
 
         private void InitializeComponent()
         {
-            cboType = new ComboBox();
-            lstParameters = new ListBox();
-            btnChangeEvent = new Button();
-            lblEventId = new Label();
-            lblEventName = new Label();
-            lblParamDescription = new Label();
-            btnCancel = new Button();
-            btnDone = new Button();
-            lblName2 = new Label();
-            lblName1 = new Label();
-            valueGrid = new PropertyGrid();
-            requirementPanel = new Panel();
-            chkNot = new CheckBox();
-            label1 = new Label();
-            cboRequirement = new ComboBox();
-            offsetPanel = new Panel();
-            offsetOkay = new Button();
-            comboBox1 = new ComboBox();
-            comboBox2 = new ComboBox();
-            comboBox3 = new ComboBox();
-            label2 = new Label();
-            label3 = new Label();
-            label4 = new Label();
-            mainPanel = new Panel();
-            splitContainer1 = new SplitContainer();
-            typePanel = new Panel();
-            requirementPanel.SuspendLayout();
-            offsetPanel.SuspendLayout();
-            ((ISupportInitialize) splitContainer1).BeginInit();
-            splitContainer1.Panel1.SuspendLayout();
-            splitContainer1.Panel2.SuspendLayout();
-            splitContainer1.SuspendLayout();
-            typePanel.SuspendLayout();
-            SuspendLayout();
+            this.cboType = new System.Windows.Forms.ComboBox();
+            this.lstParameters = new System.Windows.Forms.ListBox();
+            this.btnChangeEvent = new System.Windows.Forms.Button();
+            this.lblEventId = new System.Windows.Forms.Label();
+            this.lblEventName = new System.Windows.Forms.Label();
+            this.lblParamDescription = new System.Windows.Forms.Label();
+            this.btnCancel = new System.Windows.Forms.Button();
+            this.btnDone = new System.Windows.Forms.Button();
+            this.lblName2 = new System.Windows.Forms.Label();
+            this.lblName1 = new System.Windows.Forms.Label();
+            this.valueGrid = new System.Windows.Forms.PropertyGrid();
+            this.requirementPanel = new System.Windows.Forms.Panel();
+            this.chkNot = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cboRequirement = new System.Windows.Forms.ComboBox();
+            this.offsetPanel = new System.Windows.Forms.Panel();
+            this.offsetOkay = new System.Windows.Forms.Button();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.comboBox3 = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.mainPanel = new System.Windows.Forms.Panel();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.typePanel = new System.Windows.Forms.Panel();
+            this.requirementPanel.SuspendLayout();
+            this.offsetPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
+            this.typePanel.SuspendLayout();
+            this.SuspendLayout();
             // 
             // cboType
             // 
-            cboType.FormattingEnabled = true;
-            cboType.Items.AddRange(new object[]
-            {
-                "Value",
-                "Scalar",
-                "Drawing.Pointer",
-                "Boolean",
-                "Unknown",
-                "Variable",
-                "Requirement"
-            });
-            cboType.Location = new Point(46, 0);
-            cboType.Name = "cboType";
-            cboType.Size = new Size(82, 21);
-            cboType.TabIndex = 63;
-            cboType.SelectedIndexChanged += new EventHandler(cboType_SelectedIndexChanged);
+            this.cboType.FormattingEnabled = true;
+            this.cboType.Items.AddRange(new object[] {
+            "Value",
+            "Scalar",
+            "Drawing.Pointer",
+            "Boolean",
+            "Unknown",
+            "Variable",
+            "Requirement"});
+            this.cboType.Location = new System.Drawing.Point(46, 0);
+            this.cboType.Name = "cboType";
+            this.cboType.Size = new System.Drawing.Size(82, 21);
+            this.cboType.TabIndex = 63;
+            this.cboType.SelectedIndexChanged += new System.EventHandler(this.cboType_SelectedIndexChanged);
             // 
             // lstParameters
             // 
-            lstParameters.Dock = DockStyle.Fill;
-            lstParameters.FormattingEnabled = true;
-            lstParameters.Location = new Point(0, 21);
-            lstParameters.Name = "lstParameters";
-            lstParameters.Size = new Size(93, 92);
-            lstParameters.TabIndex = 62;
-            lstParameters.SelectedIndexChanged += new EventHandler(lstParameters_SelectedIndexChanged);
+            this.lstParameters.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstParameters.FormattingEnabled = true;
+            this.lstParameters.Location = new System.Drawing.Point(0, 21);
+            this.lstParameters.Name = "lstParameters";
+            this.lstParameters.Size = new System.Drawing.Size(93, 92);
+            this.lstParameters.TabIndex = 62;
+            this.lstParameters.SelectedIndexChanged += new System.EventHandler(this.lstParameters_SelectedIndexChanged);
             // 
             // btnChangeEvent
             // 
-            btnChangeEvent.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Right);
-            btnChangeEvent.Location = new Point(171, 2);
-            btnChangeEvent.Name = "btnChangeEvent";
-            btnChangeEvent.Size = new Size(56, 23);
-            btnChangeEvent.TabIndex = 61;
-            btnChangeEvent.Text = "Change";
-            btnChangeEvent.UseVisualStyleBackColor = true;
-            btnChangeEvent.Click += new EventHandler(btnChangeEvent_Click);
+            this.btnChangeEvent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnChangeEvent.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.btnChangeEvent.Location = new System.Drawing.Point(171, 2);
+            this.btnChangeEvent.Name = "btnChangeEvent";
+            this.btnChangeEvent.Size = new System.Drawing.Size(56, 23);
+            this.btnChangeEvent.TabIndex = 61;
+            this.btnChangeEvent.Text = "Change";
+            this.btnChangeEvent.UseVisualStyleBackColor = true;
+            this.btnChangeEvent.Click += new System.EventHandler(this.btnChangeEvent_Click);
             // 
             // lblEventId
             // 
-            lblEventId.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Right);
-            lblEventId.BackColor = Color.WhiteSmoke;
-            lblEventId.BorderStyle = BorderStyle.Fixed3D;
-            lblEventId.Location = new Point(107, 3);
-            lblEventId.Name = "lblEventId";
-            lblEventId.Size = new Size(66, 20);
-            lblEventId.TabIndex = 60;
-            lblEventId.TextAlign = ContentAlignment.MiddleCenter;
+            this.lblEventId.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblEventId.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.lblEventId.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblEventId.Location = new System.Drawing.Point(107, 3);
+            this.lblEventId.Name = "lblEventId";
+            this.lblEventId.Size = new System.Drawing.Size(66, 20);
+            this.lblEventId.TabIndex = 60;
+            this.lblEventId.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblEventId.Click += new System.EventHandler(this.lblEventId_Click);
             // 
             // lblEventName
             // 
-            lblEventName.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Left
-                                                                   | AnchorStyles.Right);
-            lblEventName.BackColor = Color.WhiteSmoke;
-            lblEventName.BorderStyle = BorderStyle.Fixed3D;
-            lblEventName.Location = new Point(2, 3);
-            lblEventName.Name = "lblEventName";
-            lblEventName.Size = new Size(105, 20);
-            lblEventName.TabIndex = 59;
-            lblEventName.TextAlign = ContentAlignment.MiddleLeft;
+            this.lblEventName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblEventName.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.lblEventName.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblEventName.Location = new System.Drawing.Point(2, 3);
+            this.lblEventName.Name = "lblEventName";
+            this.lblEventName.Size = new System.Drawing.Size(105, 20);
+            this.lblEventName.TabIndex = 59;
+            this.lblEventName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblEventName.Click += new System.EventHandler(this.lblEventName_Click);
             // 
             // lblParamDescription
             // 
-            lblParamDescription.Anchor = (AnchorStyles) (AnchorStyles.Bottom | AnchorStyles.Left
-                                                                             | AnchorStyles.Right);
-            lblParamDescription.BackColor = SystemColors.Control;
-            lblParamDescription.BorderStyle = BorderStyle.Fixed3D;
-            lblParamDescription.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular,
-                GraphicsUnit.Point,
-                (byte) 0);
-            lblParamDescription.Location = new Point(2, 140);
-            lblParamDescription.Name = "lblParamDescription";
-            lblParamDescription.Size = new Size(225, 63);
-            lblParamDescription.TabIndex = 58;
+            this.lblParamDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblParamDescription.BackColor = System.Drawing.SystemColors.Control;
+            this.lblParamDescription.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblParamDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblParamDescription.Location = new System.Drawing.Point(2, 140);
+            this.lblParamDescription.Name = "lblParamDescription";
+            this.lblParamDescription.Size = new System.Drawing.Size(225, 63);
+            this.lblParamDescription.TabIndex = 58;
             // 
             // btnCancel
             // 
-            btnCancel.Anchor = (AnchorStyles) (AnchorStyles.Bottom | AnchorStyles.Right);
-            btnCancel.Location = new Point(169, 206);
-            btnCancel.Name = "btnCancel";
-            btnCancel.Size = new Size(58, 24);
-            btnCancel.TabIndex = 57;
-            btnCancel.Text = "* - Cancel";
-            btnCancel.UseVisualStyleBackColor = true;
-            btnCancel.Click += btnCancel_Click;
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancel.Location = new System.Drawing.Point(169, 206);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(58, 24);
+            this.btnCancel.TabIndex = 57;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click_1);
             // 
             // btnDone
             // 
-            btnDone.Anchor = (AnchorStyles) (AnchorStyles.Bottom | AnchorStyles.Right);
-            btnDone.Location = new Point(105, 206);
-            btnDone.Name = "btnDone";
-            btnDone.Size = new Size(58, 24);
-            btnDone.TabIndex = 56;
-            btnDone.Text = "* - Done";
-            btnDone.UseVisualStyleBackColor = true;
-            btnDone.Click += btnDone_Click;
+            this.btnDone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDone.Location = new System.Drawing.Point(105, 206);
+            this.btnDone.Name = "btnDone";
+            this.btnDone.Size = new System.Drawing.Size(58, 24);
+            this.btnDone.TabIndex = 56;
+            this.btnDone.Text = "Done";
+            this.btnDone.UseVisualStyleBackColor = true;
+            this.btnDone.Click += new System.EventHandler(this.btnDone_Click_1);
             // 
             // lblName2
             // 
-            lblName2.BackColor = Color.WhiteSmoke;
-            lblName2.BorderStyle = BorderStyle.Fixed3D;
-            lblName2.Location = new Point(0, 0);
-            lblName2.Name = "lblName2";
-            lblName2.Size = new Size(45, 21);
-            lblName2.TabIndex = 55;
-            lblName2.Text = "Type:";
-            lblName2.TextAlign = ContentAlignment.MiddleRight;
+            this.lblName2.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.lblName2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblName2.Location = new System.Drawing.Point(0, 0);
+            this.lblName2.Name = "lblName2";
+            this.lblName2.Size = new System.Drawing.Size(45, 21);
+            this.lblName2.TabIndex = 55;
+            this.lblName2.Text = "Type:";
+            this.lblName2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lblName2.Click += new System.EventHandler(this.lblName2_Click);
             // 
             // lblName1
             // 
-            lblName1.BackColor = Color.WhiteSmoke;
-            lblName1.BorderStyle = BorderStyle.Fixed3D;
-            lblName1.Dock = DockStyle.Top;
-            lblName1.Location = new Point(0, 0);
-            lblName1.Name = "lblName1";
-            lblName1.Size = new Size(93, 21);
-            lblName1.TabIndex = 54;
-            lblName1.Text = "Parameter:";
-            lblName1.TextAlign = ContentAlignment.MiddleLeft;
+            this.lblName1.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.lblName1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblName1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblName1.Location = new System.Drawing.Point(0, 0);
+            this.lblName1.Name = "lblName1";
+            this.lblName1.Size = new System.Drawing.Size(93, 21);
+            this.lblName1.TabIndex = 54;
+            this.lblName1.Text = "Parameter:";
+            this.lblName1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // valueGrid
             // 
-            valueGrid.Dock = DockStyle.Fill;
-            valueGrid.HelpVisible = false;
-            valueGrid.Location = new Point(0, 21);
-            valueGrid.Name = "valueGrid";
-            valueGrid.Size = new Size(128, 92);
-            valueGrid.TabIndex = 8;
-            valueGrid.ToolbarVisible = false;
+            this.valueGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.valueGrid.HelpVisible = false;
+            this.valueGrid.Location = new System.Drawing.Point(0, 0);
+            this.valueGrid.Name = "valueGrid";
+            this.valueGrid.Size = new System.Drawing.Size(128, 113);
+            this.valueGrid.TabIndex = 8;
+            this.valueGrid.ToolbarVisible = false;
             // 
             // requirementPanel
             // 
-            requirementPanel.Controls.Add(chkNot);
-            requirementPanel.Controls.Add(label1);
-            requirementPanel.Controls.Add(cboRequirement);
-            requirementPanel.Dock = DockStyle.Fill;
-            requirementPanel.Location = new Point(0, 21);
-            requirementPanel.Name = "requirementPanel";
-            requirementPanel.Size = new Size(128, 92);
-            requirementPanel.TabIndex = 64;
+            this.requirementPanel.Controls.Add(this.chkNot);
+            this.requirementPanel.Controls.Add(this.label1);
+            this.requirementPanel.Controls.Add(this.cboRequirement);
+            this.requirementPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.requirementPanel.Location = new System.Drawing.Point(0, 21);
+            this.requirementPanel.Name = "requirementPanel";
+            this.requirementPanel.Size = new System.Drawing.Size(128, 92);
+            this.requirementPanel.TabIndex = 64;
             // 
             // chkNot
             // 
-            chkNot.AutoSize = true;
-            chkNot.Location = new Point(81, 3);
-            chkNot.Name = "chkNot";
-            chkNot.Size = new Size(43, 17);
-            chkNot.TabIndex = 65;
-            chkNot.Text = "Not";
-            chkNot.UseVisualStyleBackColor = true;
-            chkNot.CheckedChanged += new EventHandler(Requirement_Handle);
+            this.chkNot.AutoSize = true;
+            this.chkNot.Location = new System.Drawing.Point(81, 3);
+            this.chkNot.Name = "chkNot";
+            this.chkNot.Size = new System.Drawing.Size(43, 17);
+            this.chkNot.TabIndex = 65;
+            this.chkNot.Text = "Not";
+            this.chkNot.UseVisualStyleBackColor = true;
+            this.chkNot.CheckedChanged += new System.EventHandler(this.Requirement_Handle);
             // 
             // label1
             // 
-            label1.BackColor = Color.WhiteSmoke;
-            label1.BorderStyle = BorderStyle.Fixed3D;
-            label1.Location = new Point(0, 0);
-            label1.Name = "label1";
-            label1.Size = new Size(75, 21);
-            label1.TabIndex = 64;
-            label1.Text = "Requirement:";
-            label1.TextAlign = ContentAlignment.MiddleLeft;
+            this.label1.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label1.Location = new System.Drawing.Point(0, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(75, 21);
+            this.label1.TabIndex = 64;
+            this.label1.Text = "Requirement:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // cboRequirement
             // 
-            cboRequirement.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Left
-                                                                     | AnchorStyles.Right);
-            cboRequirement.FormattingEnabled = true;
-            cboRequirement.Location = new Point(0, 22);
-            cboRequirement.Name = "cboRequirement";
-            cboRequirement.Size = new Size(128, 21);
-            cboRequirement.TabIndex = 0;
-            cboRequirement.SelectedIndexChanged += new EventHandler(Requirement_Handle);
+            this.cboRequirement.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cboRequirement.FormattingEnabled = true;
+            this.cboRequirement.Location = new System.Drawing.Point(0, 22);
+            this.cboRequirement.Name = "cboRequirement";
+            this.cboRequirement.Size = new System.Drawing.Size(128, 21);
+            this.cboRequirement.TabIndex = 0;
+            this.cboRequirement.SelectedIndexChanged += new System.EventHandler(this.Requirement_Handle);
             // 
             // offsetPanel
             // 
-            offsetPanel.Controls.Add(offsetOkay);
-            offsetPanel.Controls.Add(comboBox1);
-            offsetPanel.Controls.Add(comboBox2);
-            offsetPanel.Controls.Add(comboBox3);
-            offsetPanel.Controls.Add(label2);
-            offsetPanel.Controls.Add(label3);
-            offsetPanel.Controls.Add(label4);
-            offsetPanel.Dock = DockStyle.Fill;
-            offsetPanel.Location = new Point(0, 21);
-            offsetPanel.Name = "offsetPanel";
-            offsetPanel.Size = new Size(128, 92);
-            offsetPanel.TabIndex = 66;
+            this.offsetPanel.Controls.Add(this.offsetOkay);
+            this.offsetPanel.Controls.Add(this.comboBox1);
+            this.offsetPanel.Controls.Add(this.comboBox2);
+            this.offsetPanel.Controls.Add(this.comboBox3);
+            this.offsetPanel.Controls.Add(this.label2);
+            this.offsetPanel.Controls.Add(this.label3);
+            this.offsetPanel.Controls.Add(this.label4);
+            this.offsetPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.offsetPanel.Location = new System.Drawing.Point(0, 21);
+            this.offsetPanel.Name = "offsetPanel";
+            this.offsetPanel.Size = new System.Drawing.Size(128, 92);
+            this.offsetPanel.TabIndex = 66;
             // 
             // offsetOkay
             // 
-            offsetOkay.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Left
-                                                                 | AnchorStyles.Right);
-            offsetOkay.Location = new Point(-1, 69);
-            offsetOkay.Name = "offsetOkay";
-            offsetOkay.Size = new Size(129, 23);
-            offsetOkay.TabIndex = 13;
-            offsetOkay.Text = "Okay";
-            offsetOkay.UseVisualStyleBackColor = true;
-            offsetOkay.Click += new EventHandler(offsetOkay_Click);
+            this.offsetOkay.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.offsetOkay.BackColor = System.Drawing.SystemColors.Control;
+            this.offsetOkay.Location = new System.Drawing.Point(-1, 69);
+            this.offsetOkay.Name = "offsetOkay";
+            this.offsetOkay.Size = new System.Drawing.Size(129, 23);
+            this.offsetOkay.TabIndex = 13;
+            this.offsetOkay.Text = "Okay";
+            this.offsetOkay.UseVisualStyleBackColor = false;
+            this.offsetOkay.Click += new System.EventHandler(this.offsetOkay_Click);
             // 
             // comboBox1
             // 
-            comboBox1.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Left
-                                                                | AnchorStyles.Right);
-            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Items.AddRange(new object[]
-            {
-                "Actions",
-                "SubActions",
-                "SubRoutines",
-                "External",
-                "Null"
-            });
-            comboBox1.Location = new Point(46, 3);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(82, 21);
-            comboBox1.TabIndex = 7;
-            comboBox1.SelectedIndexChanged += new EventHandler(comboBox1_SelectedIndexChanged);
+            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "Actions",
+            "SubActions",
+            "SubRoutines",
+            "External",
+            "Null",
+            "Screen Tints",
+            "Flash Overlays"});
+            this.comboBox1.Location = new System.Drawing.Point(46, 0);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(82, 21);
+            this.comboBox1.TabIndex = 7;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // comboBox2
             // 
-            comboBox2.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Left
-                                                                | AnchorStyles.Right);
-            comboBox2.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(46, 24);
-            comboBox2.Name = "comboBox2";
-            comboBox2.Size = new Size(82, 21);
-            comboBox2.TabIndex = 9;
+            this.comboBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Location = new System.Drawing.Point(46, 24);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(82, 21);
+            this.comboBox2.TabIndex = 9;
             // 
             // comboBox3
             // 
-            comboBox3.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Left
-                                                                | AnchorStyles.Right);
-            comboBox3.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBox3.FormattingEnabled = true;
-            comboBox3.Location = new Point(46, 45);
-            comboBox3.Name = "comboBox3";
-            comboBox3.Size = new Size(82, 21);
-            comboBox3.TabIndex = 11;
+            this.comboBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox3.FormattingEnabled = true;
+            this.comboBox3.Location = new System.Drawing.Point(46, 48);
+            this.comboBox3.Name = "comboBox3";
+            this.comboBox3.Size = new System.Drawing.Size(82, 21);
+            this.comboBox3.TabIndex = 11;
             // 
             // label2
             // 
-            label2.BackColor = Color.WhiteSmoke;
-            label2.BorderStyle = BorderStyle.Fixed3D;
-            label2.Location = new Point(0, 3);
-            label2.Name = "label2";
-            label2.Size = new Size(45, 21);
-            label2.TabIndex = 8;
-            label2.Text = "List:";
-            label2.TextAlign = ContentAlignment.MiddleRight;
+            this.label2.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.label2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.label2.Location = new System.Drawing.Point(0, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(45, 21);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "List:";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label3
             // 
-            label3.BackColor = Color.WhiteSmoke;
-            label3.BorderStyle = BorderStyle.Fixed3D;
-            label3.Location = new Point(0, 24);
-            label3.Name = "label3";
-            label3.Size = new Size(45, 21);
-            label3.TabIndex = 10;
-            label3.Text = "Action:";
-            label3.TextAlign = ContentAlignment.MiddleRight;
+            this.label3.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.label3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.label3.Location = new System.Drawing.Point(0, 24);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(45, 21);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Action:";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label4
             // 
-            label4.BackColor = Color.WhiteSmoke;
-            label4.BorderStyle = BorderStyle.Fixed3D;
-            label4.Location = new Point(0, 45);
-            label4.Name = "label4";
-            label4.Size = new Size(45, 21);
-            label4.TabIndex = 12;
-            label4.Text = "Type:";
-            label4.TextAlign = ContentAlignment.MiddleRight;
+            this.label4.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.label4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.label4.Location = new System.Drawing.Point(0, 48);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(45, 21);
+            this.label4.TabIndex = 12;
+            this.label4.Text = "Type:";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // mainPanel
             // 
-            mainPanel.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Bottom
-                                                                | AnchorStyles.Left
-                                                                | AnchorStyles.Right);
-            mainPanel.Location = new Point(2, 25);
-            mainPanel.Name = "mainPanel";
-            mainPanel.Size = new Size(225, 113);
-            mainPanel.TabIndex = 0;
+            this.mainPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.mainPanel.Location = new System.Drawing.Point(2, 25);
+            this.mainPanel.Name = "mainPanel";
+            this.mainPanel.Size = new System.Drawing.Size(225, 113);
+            this.mainPanel.TabIndex = 0;
             // 
             // splitContainer1
             // 
-            splitContainer1.Anchor = (AnchorStyles) (AnchorStyles.Top | AnchorStyles.Bottom
-                                                                      | AnchorStyles.Left
-                                                                      | AnchorStyles.Right);
-            splitContainer1.Location = new Point(2, 25);
-            splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.Location = new System.Drawing.Point(2, 25);
+            this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
             // 
-            splitContainer1.Panel1.Controls.Add(lstParameters);
-            splitContainer1.Panel1.Controls.Add(lblName1);
+            this.splitContainer1.Panel1.Controls.Add(this.lstParameters);
+            this.splitContainer1.Panel1.Controls.Add(this.lblName1);
             // 
             // splitContainer1.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(offsetPanel);
-            splitContainer1.Panel2.Controls.Add(valueGrid);
-            splitContainer1.Panel2.Controls.Add(requirementPanel);
-            splitContainer1.Panel2.Controls.Add(typePanel);
-            splitContainer1.Size = new Size(225, 113);
-            splitContainer1.SplitterDistance = 93;
-            splitContainer1.TabIndex = 9;
+            this.splitContainer1.Panel2.Controls.Add(this.offsetPanel);
+            this.splitContainer1.Panel2.Controls.Add(this.requirementPanel);
+            this.splitContainer1.Panel2.Controls.Add(this.typePanel);
+            this.splitContainer1.Panel2.Controls.Add(this.valueGrid);
+            this.splitContainer1.Size = new System.Drawing.Size(225, 113);
+            this.splitContainer1.SplitterDistance = 93;
+            this.splitContainer1.TabIndex = 9;
             // 
             // typePanel
             // 
-            typePanel.Controls.Add(lblName2);
-            typePanel.Controls.Add(cboType);
-            typePanel.Dock = DockStyle.Top;
-            typePanel.Location = new Point(0, 0);
-            typePanel.Name = "typePanel";
-            typePanel.Size = new Size(128, 21);
-            typePanel.TabIndex = 64;
+            this.typePanel.Controls.Add(this.lblName2);
+            this.typePanel.Controls.Add(this.cboType);
+            this.typePanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.typePanel.Location = new System.Drawing.Point(0, 0);
+            this.typePanel.Name = "typePanel";
+            this.typePanel.Size = new System.Drawing.Size(128, 21);
+            this.typePanel.TabIndex = 64;
             // 
             // EventModifier
             // 
-            AutoSize = true;
-            Controls.Add(splitContainer1);
-            Controls.Add(mainPanel);
-            Controls.Add(btnChangeEvent);
-            Controls.Add(lblEventId);
-            Controls.Add(lblEventName);
-            Controls.Add(lblParamDescription);
-            Controls.Add(btnCancel);
-            Controls.Add(btnDone);
-            Name = "EventModifier";
-            Size = new Size(230, 233);
-            requirementPanel.ResumeLayout(false);
-            requirementPanel.PerformLayout();
-            offsetPanel.ResumeLayout(false);
-            splitContainer1.Panel1.ResumeLayout(false);
-            splitContainer1.Panel2.ResumeLayout(false);
-            ((ISupportInitialize) splitContainer1).EndInit();
-            splitContainer1.ResumeLayout(false);
-            typePanel.ResumeLayout(false);
-            ResumeLayout(false);
+            this.AutoSize = true;
+            this.Controls.Add(this.splitContainer1);
+            this.Controls.Add(this.mainPanel);
+            this.Controls.Add(this.btnChangeEvent);
+            this.Controls.Add(this.lblEventId);
+            this.Controls.Add(this.lblEventName);
+            this.Controls.Add(this.lblParamDescription);
+            this.Controls.Add(this.btnCancel);
+            this.Controls.Add(this.btnDone);
+            this.Name = "EventModifier";
+            this.Size = new System.Drawing.Size(230, 233);
+            this.Load += new System.EventHandler(this.EventModifier_Load);
+            this.requirementPanel.ResumeLayout(false);
+            this.requirementPanel.PerformLayout();
+            this.offsetPanel.ResumeLayout(false);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
+            this.typePanel.ResumeLayout(false);
+            this.ResumeLayout(false);
+
         }
 
         #endregion
@@ -495,6 +505,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             if (info != null)
             {
                 lblEventName.Text = info._name;
+                lblParamDescription.Text = info._description;
             }
 
             lblEventId.Text = Helpers.Hex8(eventData._event);
@@ -542,17 +553,44 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
 
                 _updating = true;
                 comboBox1.SelectedIndex = offset.list;
-                if (offset.type != -1)
+                if (comboBox1.SelectedIndex != 4)
                 {
-                    comboBox3.SelectedIndex = offset.type;
-                }
+                    if (offset.type != -1)
+                    {
+                        comboBox3.SelectedIndex = offset.type;
+                    }
 
-                if (offset.index != -1)
-                {
-                    comboBox2.SelectedIndex = offset.index;
+                    if (offset.index != -1)
+                    {
+                        comboBox2.SelectedIndex = offset.index;
+                    }
                 }
+                else
+                {
+                    offset.type = -1;
+                    offset.index = -1;
+                }
+ 
 
                 _updating = false;
+            }
+            else if (value is MoveDefEventRequirementNode)
+            {
+                requirementPanel.Visible = true;
+                valueGrid.Visible = false;
+                offsetPanel.Visible = false;
+
+                _updating = true;
+                MoveDefEventRequirementNode offset = value as MoveDefEventRequirementNode;
+
+                if (cboRequirement.SelectedIndex == -1)
+                {
+
+                    chkNot.Checked = offset.Not;
+                    int convert = offset._value & 0x7FFFFFFF;
+                    convert = (convert >= 9999) ? convert - 9999 + iReq9999loc : convert; //270F is 9999
+                    cboRequirement.SelectedIndex = convert;
+                }
             }
             else
             {
@@ -584,8 +622,25 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
                 ActionEventInfo info = newEvent.EventInfo;
 
                 newEvent.NewChildren();
+                if (!frmEventList.resetParameter) //TODO: Reset Params check
+                {
+                    newEvent.Replace(origEvent, false);
+                }
+                else
+                {
+                    chkNot.Checked = false;
+                }
+                if (newEvent.Children.Count > 0)
+                {
+                    param = newEvent.Children[0] as MoveDefEventParameterNode;
+                    cboRequirement.SelectedIndex = param._value & 0x7FFFFFFF;
+                }
+                else
+                {
+                    param = null;
+                }
             }
-
+            
             DisplayEvent();
         }
 
@@ -594,8 +649,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             if (lstParameters.SelectedIndex == -1)
             {
                 return;
-            }
-
+            };
             int index = lstParameters.SelectedIndex;
             DisplayParameter(index);
         }
@@ -644,6 +698,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
 
         private void Requirement_Handle(object sender, EventArgs e)
         {
+            
             if (cboRequirement.SelectedIndex == -1)
             {
                 return;
@@ -656,6 +711,8 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
 
             int index = lstParameters.SelectedIndex;
             long value = cboRequirement.SelectedIndex;
+            if (index >= iReq9999loc)
+                value += 9999 - iReq9999loc; //0x270F
             if (chkNot.Checked)
             {
                 value |= 0x80000000;
@@ -704,7 +761,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
                 comboBox2.Items.AddRange(param.Root._actions.Children.ToArray());
             }
 
-            if (comboBox1.SelectedIndex == 1)
+            if (comboBox1.SelectedIndex == 1 && param.Root.dataCommon == null) //TODO: Doesn't remove from Fighter.pac! Should.
             {
                 comboBox3.Items.Clear();
                 comboBox3.Items.Add("Main");
@@ -745,6 +802,16 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
                 comboBox2.Items.Clear();
                 comboBox2.Items.AddRange(param.Root._externalRefs.ToArray());
             }
+            if (comboBox1.SelectedIndex == 5 && param.Root.dataCommon != null)
+            {
+                comboBox2.Items.Clear();
+                comboBox2.Items.AddRange(param.Root.dataCommon._screenTint.Children.ToArray());
+            }
+            if (comboBox1.SelectedIndex == 6 && param.Root.dataCommon != null)
+            {
+                comboBox2.Items.Clear(); 
+                comboBox2.Items.AddRange(param.Root.dataCommon._flashOverlay.Children.ToArray());
+            }
         }
 
         private void offsetOkay_Click(object sender, EventArgs e)
@@ -761,7 +828,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
                 if (comboBox1.SelectedIndex == 3 && comboBox2.SelectedIndex >= 0 &&
                     comboBox2.SelectedIndex < param.Root._externalRefs.Count)
                 {
-                    if (_targetNode._extNode != null)
+                    if (_targetNode.External)
                     {
                         _targetNode._extNode._refs.Remove(_targetNode);
                         _targetNode._extNode = null;
@@ -796,6 +863,59 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             }
 
             param.SignalPropertyChange();
+        }
+
+        private void lblName2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnCancel_Click_1(object sender, EventArgs e)
+        {
+            (Parent as FormModifyEvent).Close();
+        }
+
+        private void btnDone_Click_1(object sender, EventArgs e) // Used to update the event modified.
+        {
+            FormModifyEvent parentWindow = (FormModifyEvent)Parent;
+
+            int selectedEvent = parentWindow.handler.EventList.SelectedIndex;
+            int topEvent = parentWindow.handler.EventList.TopIndex;
+            origEvent.Replace(newEvent);
+            parentWindow.handler.MakeScript();
+            parentWindow.handler.EventList.SetSelected(selectedEvent, true);
+            parentWindow.handler.EventList.TopIndex = topEvent;
+            parentWindow.Close();
+        }
+
+        private void lblEventName_Click(object sender, EventArgs e) //Clicking the name of the event.
+        {
+            DisplayEvent();
+        }
+
+        private void lblEventId_Click(object sender, EventArgs e) //Clicking the ID of the event.
+        {
+            DisplayEvent();
+        }
+
+        private void EventModifier_Load(object sender, EventArgs e) //Initialize window
+        {
+            //Link the requirements!
+            if (!parentDesignMode) //cheese a private variable and a stubborn IDE that hates the below conversion
+            {
+                cboRequirement.Items.Clear();
+                cboRequirement.Items.AddRange((Parent as FormModifyEvent).handler.currentMoveDef.iRequirements);
+                iReq9999loc = cboRequirement.Items.Count;
+                cboRequirement.Items.AddRange((Parent as FormModifyEvent).handler.currentMoveDef.iRequirementsUniq);
+                for (int i = 0; i < cboRequirement.Items.Count; i++)
+                {
+                    if ((string)cboRequirement.Items[i] == "270F")
+                    {
+                        iReq9999loc = i;
+                        break;
+                    }
+                }
+            }
         }
     }
 }

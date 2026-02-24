@@ -1,7 +1,11 @@
 ﻿using BrawlLib.Internal;
 using BrawlLib.SSBB.Types;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Policy;
 
 namespace BrawlLib.SSBB.ResourceNodes
 {
@@ -105,6 +109,17 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
+        internal static void AddNamedAction(List<MoveDefEntryNode> named, MoveDefActionNode node)
+        {
+            string name = node.Name;
+            if (!(name == null ||
+                name == "Entry" || name == "Exit" || 
+                name == "Main" || name == "GFX" || name == "SFX" || name == "Other" ||
+                name.StartsWith("SubRoutine") || name.StartsWith("Action")))
+            {
+                named.Add(node);
+            }
+        }
         public static int CalcDataSize(MoveDefDataNode node)
         {
             int
@@ -316,9 +331,25 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             part6Len += GetSize(node.entryArticle, ref lookupCount);
 
+            
             foreach (MoveDefEntryNode e in node._articles.Values)
             {
                 part6Len += GetSize(e, ref lookupCount);
+                lookupCount++;
+            }
+            foreach (MoveDefEntryNode e in node._extraParams.Values)
+            {
+                part6Len += GetSize(e, ref lookupCount);
+                lookupCount++;
+            }
+            foreach (MoveDefEntryNode e in node._extraUnique.Values)
+            {
+                part6Len += GetSize(e, ref lookupCount);
+                lookupCount++;
+            }
+            if (RootNode.Name == "MoveDef_FitRobot")
+            {
+                part6Len += 0x10; //4 ints, one for each of the initial articles. Unknown why.
             }
 
             part6Len += GetSize(node.misc.unkSection2, ref lookupCount);
@@ -347,6 +378,8 @@ namespace BrawlLib.SSBB.ResourceNodes
             part6Len += GetSize(node.misc.unkSection5, ref lookupCount);
 
             part6Len += GetSize(node.misc.soundData, ref lookupCount);
+
+
 
             #endregion
 
@@ -397,6 +430,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                     lookupCount += node._lookupCount;
                 }
 
+                /*
                 MoveDefEntryNode next = node;
                 Top:
                 //Check for random params around the file
@@ -426,7 +460,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                         }
                     }
                 }
-
+                */
                 return size;
             }
 
@@ -443,6 +477,9 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             node._entryOffset = header;
 
+            List<int>articleBuilds = new List<int>();
+            List<int> paramBuilds = new List<int>();
+
             bint* extraOffsets = (bint*) ((VoidPtr) header + 124);
 
             bint* action1Offsets = (bint*) (dataAddress + node.part1Len + node.part2Len);
@@ -452,6 +489,8 @@ namespace BrawlLib.SSBB.ResourceNodes
             bint* GFXOffsets = (bint*) ((VoidPtr) mainOffsets + RootNode._subActions.Children.Count * 4);
             bint* SFXOffsets = (bint*) ((VoidPtr) GFXOffsets + RootNode._subActions.Children.Count * 4);
             bint* otherOffsets = (bint*) ((VoidPtr) SFXOffsets + RootNode._subActions.Children.Count * 4);
+
+            //0x20 block header?
 
             FDefMiscSection* miscOffsetsAddr = (FDefMiscSection*) (dataAddress + (node._childLength - 0x4C));
 
@@ -885,11 +924,6 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             header->EntryArticleStart = Rebuild(RootNode, node.entryArticle, ref dataAddress, baseAddress);
 
-            foreach (MoveDefArticleNode e in node._articles.Values)
-            {
-                Rebuild(RootNode, e, ref dataAddress, baseAddress);
-            }
-
             if ((miscOffsetsAddr->UnknownSection2Offset =
                 Rebuild(RootNode, node.misc.unkSection2, ref dataAddress, baseAddress)) > 0)
             {
@@ -946,6 +980,8 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             header->BoneRef1 = Rebuild(RootNode, node.boneRef1, ref dataAddress, baseAddress);
 
+ 
+
             miscOffsetsAddr->BoneRef2Offset = Rebuild(RootNode, node.misc.boneRefs, ref dataAddress, baseAddress);
 
             miscOffsetsAddr->UnknownSection5Offset =
@@ -953,11 +989,57 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             miscOffsetsAddr->SoundDataOffset = Rebuild(RootNode, node.misc.soundData, ref dataAddress, baseAddress);
 
+            //TODO: Add extra offsets!
+            int extraCount = node.ExtraOffsetCount();
+
+            for (int i = 0; i < 5; i++) //Neutral, Side, Up, Down Specials, Final Smash
+            {
+                header->Extras[i] = Rebuild(RootNode, node._extraEntries[i], ref dataAddress, baseAddress).Reverse();
+            }
+            if (RootNode.Name == "MoveDef_FitRobot")
+            {
+                for (int i = 5, j = 5, k = 0; i < node._extraEntries.Count; i++, j++)
+                {
+                    if (!node._extraEntries.ContainsKey(j))
+                    {
+                        header->Extras[j] = k.Reverse();
+                        j++;
+                        k++;
+                    }
+                    if (node._extraEntries[j] is Pit7Robot13Node)
+                    {
+                        header->Extras[j] = Rebuild(RootNode, node._extraEntries[j], ref dataAddress, baseAddress).Reverse();
+                    }
+                    else if (node._extraEntries[j] is MoveDefArticleNode ||
+                        node._extraEntries[j] is MoveDefSectionParamNode)    
+                    {
+                        header->Extras[j] = Rebuild(RootNode, node._extraEntries[j], ref dataAddress, baseAddress).Reverse();
+                    }
+                    else
+                    {
+                        bool warning = true;
+                    } 
+                }
+            }
+            else
+            {
+                for (int i = 5; i < node._extraOffsets.Count; i++)
+                {
+                    if (node._extraEntries[i] is MoveDefArticleNode || node._extraEntries[i] is MoveDefSectionParamNode)
+                    {
+                        header->Extras[i] = Rebuild(RootNode, node._extraEntries[i], ref dataAddress, baseAddress).Reverse();
+                    }
+                    else
+                    {
+                        bool warning = true;
+                    }
+                }
+            }
             #endregion
 
             #region Part 7
 
-            if ((int) dataAddress - (int) baseAddress != node.part1Len + node.part2Len + node.part3Len + node.part4Len +
+            if ((int)dataAddress - (int)baseAddress != node.part1Len + node.part2Len + node.part3Len + node.part4Len +
                 node.part5Len + node.part6Len)
             {
                 Console.WriteLine("p7");
@@ -967,14 +1049,14 @@ namespace BrawlLib.SSBB.ResourceNodes
             dataAddress += 0x4C;
 
             #endregion
-
+            /* //TODO: Fix. Testing FitRobot!!
             //Params
             int l = 0, ind = 0;
             foreach (int i in node._extraOffsets)
             {
                 if (i > 1480 && i < RootNode.dataSize)
                 {
-                    MoveDefEntryNode e = node._extraEntries[l];
+                    MoveDefEntryNode e = node._extraEntries[l]; 
 
                     if (extraOffsets[ind] == 0)
                     {
@@ -999,6 +1081,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                 ind++;
             }
+            */
 
             header->EntryActionOverrides = node.override1 != null && node.override1.External
                 ? (int) node.override1._entryOffset - (int) baseAddress
@@ -1013,22 +1096,30 @@ namespace BrawlLib.SSBB.ResourceNodes
             header->Flags2 = node.Flags2int;
 
             bint* offsets = (bint*) header;
-            for (int i = 0; i < 27; i++)
+            for (int i = 0; i < 27; i++) //Data Offset table goes from 00-to-26
             {
                 if (offsets[i] > 0)
                 {
                     MoveDefNode._lookupOffsets.Add((int) &offsets[i] - (int) baseAddress);
                 }
             }
+            for (int i = 0; i < extraCount; i++) //Extras start at 0x7C, basically entry 31 relative to offsets
+            {
+                if (offsets[i+31] > 0x10)
+                {
+                    MoveDefNode._lookupOffsets.Add((int)&offsets[i+31] - (int)baseAddress);
+                }
+            }
 
             offsets = (bint*) miscOffsetsAddr;
             for (int i = 0; i < 19; i++)
-            {
-                if (offsets[i] > 0 && !(i % 2 == 0 && i > 0 && i < 9))
+            { //if more than 0 AND NOT (i even && ( 9 > i > 0)) AKA i > 0 and either more than 8 or odd?????
+                if (offsets[i] > 0 && !(i % 2 == 0 && i > 0 && i < 9)) 
                 {
                     MoveDefNode._lookupOffsets.Add((int) &offsets[i] - (int) baseAddress);
                 }
             }
+            //dataAddress += 0x110; //suspect way to deal with corruption?
 
             //Go back and add offsets to nodes that need them
             foreach (MoveDefEntryNode entry in RootNode._postProcessNodes)
@@ -1053,10 +1144,11 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                     MoveDefNode._lookupOffsets.AddRange(node._lookupOffsets.ToArray());
                 }
-
+                /*
                 MoveDefEntryNode next = node;
                 Top:
                 //Check for random params around the file
+                
                 if (next.Parent is MoveDefDataNode)
                 {
                     if (next.Parent.Children.Count > next.Index + 1)
@@ -1091,7 +1183,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                         }
                     }
                 }
-
+                */
                 return node._rebuildOffset;
             }
             else
@@ -1416,8 +1508,10 @@ namespace BrawlLib.SSBB.ResourceNodes
             return 0;
         }
 
-        internal static void BuildDataCommon(MoveDefDataCommonNode node, int length, bool force)
+        internal static void BuildDataCommon(MoveDefNode root, MoveDefEntryNode node, ref VoidPtr dataAddress, VoidPtr baseAddress)
         {
+            //TODO: This needs to base off BuildData!!!
+            Rebuild(root, node, ref dataAddress, baseAddress);
         }
     }
 }

@@ -3,6 +3,7 @@ using BrawlLib.SSBB.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 
 namespace BrawlLib.SSBB.ResourceNodes
 {
@@ -32,10 +33,21 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override int OnCalculateSize(bool force)
         {
+            int childCount = Children.Count;
+            _lookupCount = childCount * 2; //TODO Modify this so that the Entry and Exit
+                                           //are not using the same calculations! 
             int s = 0;
             foreach (MoveDefEntryNode g in Children)
             {
                 s += g.Children.Count * 4;
+                if (force) //toggle for command data to be included for ease of debugging
+                {
+                    foreach (MoveDefActionNode d in g.Children)
+                    {
+                        s += d.OnCalculateSize(true);
+                        _lookupCount += d._lookupCount;
+                    }
+                }
             }
 
             return s;
@@ -82,6 +94,26 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
 
             return false;
+        }
+
+        public override void Remove() //Used to Delete internal references!
+        {
+            if (Parent is MoveDefSectionNode)
+            {
+                MoveDefSectionNode parentVar = Parent as MoveDefSectionNode;
+                foreach (NameSizeGroup a in parentVar.DataTable.Keys)
+                {
+                    if (a.Name == _name)
+                    {
+                        parentVar.DataTable.Remove(a);
+                        parentVar._sectionList.Remove(this);
+                        parentVar.Root._externalSections.Remove(this);
+                        goto ContinueRemove;
+                    }
+                }
+            }
+            ContinueRemove:
+            base.Remove();
         }
 
         public override int OnCalculateSize(bool force)

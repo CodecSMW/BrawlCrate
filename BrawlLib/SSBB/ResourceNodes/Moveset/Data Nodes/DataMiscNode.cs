@@ -62,21 +62,22 @@ namespace BrawlLib.SSBB.ResourceNodes
         {
             base.OnInitialize();
             misc = *Header;
-            return false;
+            //return false;
+            return true; // TODO: was disabled before! Misc settings need checking!
         }
 
         public CollisionDataNode collisionData;
         public MoveDefMiscUnkSection12Node unk12;
         public MoveDefTetherNode tether;
         public UnkSection1Node unkSection1;
-        public MoveDefSectionUnk1Node unkBoneSection;
+        public MoveDefFinalSmashAuraNode unkBoneSection;  // Final Smash Aura
         public MoveDefMiscHurtBoxesNode hurtBoxes;
         public MoveDefLedgegrabsNode ledgeGrabs;
         public UnknownSection2Node unkSection2;
         public MoveDefBoneIndicesNode boneRefs;
         public UnknownSection3Node unkSection3;
         public MoveDefSoundDatasNode soundData;
-        public UnkSection5Node unkSection5;
+        public UnkSection1Node unkSection5; //Crouch animation idle probabilities. Uses same format as unkSection1
         public MoveDefMultiJumpNode multiJump;
         public MoveDefGlideNode glide;
         public MoveDefCrawlNode crawl;
@@ -91,7 +92,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             if (UnkBoneSectionOffset != 0)
             {
-                (unkBoneSection = new MoveDefSectionUnk1Node(Header->UnkBoneSectionCount)).Initialize(this,
+                (unkBoneSection = new MoveDefFinalSmashAuraNode(Header->UnkBoneSectionCount)).Initialize(this,
                     new DataSource(BaseAddress + UnkBoneSectionOffset, 0));
             }
 
@@ -133,8 +134,10 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             if (UnkSection5Offset != 0)
             {
-                (unkSection5 = new UnkSection5Node()).Initialize(this,
+                (unkSection5 = new UnkSection1Node()).Initialize(this,
                     new DataSource(BaseAddress + UnkSection5Offset, 0));
+                unkSection5._name = "Misc Crouch Idle Probabilities"; //Misc Section 5
+
             }
 
             if (MultiJumpOffset != 0)
@@ -170,6 +173,99 @@ namespace BrawlLib.SSBB.ResourceNodes
                     new DataSource(BaseAddress + UnknownSection12Offset, 0));
             }
         }
+        public override int OnCalculateSize(bool force)
+        {
+            return 0x4C; //Guaranteed fixed size of this table.
+        }
+        public override void OnRebuild(VoidPtr address, int length, bool force)
+        {
+            bint* addr = (bint*)address;
+            _entryOffset = addr;
+            MoveDefMiscDataRef* header = (MoveDefMiscDataRef*)addr;
+            if (UnknownSection1Offset != 0)
+            {
+                header->_waitIdleOffset = UnknownSection1Offset;
+                _lookupOffsets.Add((int)header->_waitIdleOffset.Address - (int)_rebuildBase);
+            }
+            if (UnkBoneSectionOffset != 0)
+            {
+                header->_finalAuraOffset = UnkBoneSectionOffset;
+                _lookupOffsets.Add((int)header->_finalAuraOffset.Address - (int)_rebuildBase);
+                header->_finalAuraCount = UnkBoneSectionCount;
+            }
+            if (HurtBoxOffset != 0)
+            {
+                header->_hurtboxOffset = HurtBoxOffset;
+                _lookupOffsets.Add((int)header->_hurtboxOffset.Address - (int)_rebuildBase);
+                header->_hurtboxCount = HurtBoxCount;
+            }
+            if (LedgegrabOffset != 0)
+            {
+                header->_ledgeGrabOffset = LedgegrabOffset;
+                _lookupOffsets.Add((int)header->_ledgeGrabOffset.Address - (int)_rebuildBase);
+                header->_ledgeGrabCount = LedgegrabCount;
+            }
+            if (UnknownSection2Offset != 0)
+            {
+                header->_misc2Offset = UnknownSection2Offset;
+                _lookupOffsets.Add((int)header->_misc2Offset.Address - (int)_rebuildBase);
+                header->_misc2Count = UnknownSection2Count;
+            }
+            if (MultiJumpOffset != 0)
+            {
+                header->_multiJumpOffset = MultiJumpOffset;
+                _lookupOffsets.Add((int)header->_multiJumpOffset.Address - (int)_rebuildBase);
+            }
+            if (GlideOffset != 0)
+            {
+                header->_glideOffset = GlideOffset;
+                _lookupOffsets.Add((int)header->_glideOffset.Address - (int)_rebuildBase);
+            }
+            if (CrawlOffset != 0)
+            {
+                header->_crawlOffset = CrawlOffset;
+                _lookupOffsets.Add((int)header->_crawlOffset.Address - (int)_rebuildBase);
+            }
+            if (TetherOffset != 0)
+            {
+                header->_tetherOffset = TetherOffset;
+                _lookupOffsets.Add((int)header->_tetherOffset.Address - (int)_rebuildBase);
+            }
+            if (UnknownSection12Offset != 0)
+            {
+                header->_misc12Offset = UnknownSection12Offset;
+                _lookupOffsets.Add((int)header->_misc12Offset.Address - (int)_rebuildBase);
+
+            }
+        }
+    }
+
+    public unsafe struct MoveDefMiscDataRef //Size: 0x4C bytes
+    {
+        public bint _waitIdleOffset;  // Section 1. Wait Idle Probabilities
+        
+        public bint _finalAuraOffset;
+        public bint _finalAuraCount;
+
+        public bint _hurtboxOffset;
+        public bint _hurtboxCount;
+
+        public bint _ledgeGrabOffset;
+        public bint _ledgeGrabCount;
+
+        public bint _misc2Offset;
+        public bint _misc2Count;
+
+        public bint _boneReferencesOffset;
+        public bint _itemBonesOffset;
+        public bint _soundDataOffset;
+        public bint _crouchIdleOffset; // SEction 5. Crouch Idle Probabilities
+        public bint _multiJumpOffset;
+        public bint _glideOffset;
+        public bint _crawlOffset;
+        public bint _tetherOffset;
+        public bint _collisionDataOffset;
+        public bint _misc12Offset;
     }
 
     public unsafe class MoveDefMiscUnkSection9Node : MoveDefEntryNode
@@ -501,7 +597,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
     }
-
+    /*
     public unsafe class UnkSection5Node : MoveDefEntryNode
     {
         internal FDefMiscSection5* Header => (FDefMiscSection5*) WorkingUncompressed.Address;
@@ -580,10 +676,11 @@ namespace BrawlLib.SSBB.ResourceNodes
             header->_unk4 = _unk4;
         }
     }
-
+    */
     public unsafe class UnkSection1Node : MoveDefEntryNode
     {
         public override ResourceType ResourceFileType => ResourceType.Unknown;
+        internal byte* Header => (byte*)WorkingUncompressed.Address;
 
         internal bint* values => (bint*) WorkingUncompressed.Address;
 
@@ -599,35 +696,91 @@ namespace BrawlLib.SSBB.ResourceNodes
                 SignalPropertyChange();
             }
         }
-
         public override bool OnInitialize()
         {
-            _name = "Misc Section 1";
             base.OnInitialize();
+            _name = "Misc Idle Probabilities"; // Standing Idles, Misc Section 1
 
-            _entries = new int[Size / 4];
-            for (int i = 0; i < _entries.Length; i++)
+            return true;
+        }
+        public override void OnPopulate()
+        {
+            byte* addr = Header;
+            for (int i = 0; i < 10; i++) // Should be a max of 5 idles but will make it more lax
             {
-                _entries[i] = values[i];
+                new UnkSection1EntryNode().Initialize(this, addr + i * 8, 8);
+                if (values[i*2] == -1)
+                {
+                    break;
+                }
             }
 
-            return false;
+            SetSizeInternal(Children.Count * 8);
         }
 
         public override int OnCalculateSize(bool force)
         {
             _lookupCount = 0;
-            return _entries.Length * 4;
+            return Children.Count * 8;
         }
 
         public override void OnRebuild(VoidPtr address, int length, bool force)
         {
             _entryOffset = address;
-            for (int i = 0; i < _entries.Length; i++)
+            bint test;
+            for (int i = 0; i < Children.Count; i++)
             {
-                *(bint*) (address + i * 4) = _entries[i];
+                Children[i].Rebuild(address + i * 8, 8, force);
             }
         }
+    }
+
+    public unsafe class UnkSection1EntryNode : MoveDefEntryNode
+    {
+        internal UnkDataMiscOff1* Header => (UnkDataMiscOff1*)WorkingUncompressed.Address;
+        public override ResourceType ResourceFileType => ResourceType.Unknown;
+
+        private UnkDataMiscOff1 hdr;
+        public override bool OnInitialize()
+        {
+            base.OnInitialize();
+            _name = "Entry " + Index;
+            hdr = *Header;
+            return true;
+        }
+        public override int OnCalculateSize(bool force)
+        {
+            _lookupCount = 0;
+            return 8;
+        }
+        [Category("Idle Animation Entry")]
+        public int AnimID
+        {
+            get => hdr.animIndex;
+            set
+            {
+                hdr.animIndex = value;
+                SignalPropertyChange();
+            }
+        }
+
+        [Category("Idle Animation Entry")]
+        public int Probability
+        {
+            get => hdr.probability;
+            set
+            {
+                hdr.probability = value;
+                SignalPropertyChange();
+            }
+        }
+
+    }
+
+    public struct UnkDataMiscOff1
+    {
+        public bint animIndex;
+        public bint probability;
     }
 
     public unsafe class UnknownSection2Node : MoveDefEntryNode
@@ -1065,7 +1218,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         public override ResourceType ResourceFileType => ResourceType.MDefHurtboxList;
 
         internal int Count;
-
+        int hurtboxSize = 0x20;
         public MoveDefMiscHurtBoxesNode(int count)
         {
             Count = count;
@@ -1083,14 +1236,14 @@ namespace BrawlLib.SSBB.ResourceNodes
             FDefHurtBox* entry = Start;
             for (int i = 0; i < Count; i++)
             {
-                new MoveDefHurtBoxNode().Initialize(this, new DataSource((VoidPtr) entry++, 0x20));
+                new MoveDefHurtBoxNode().Initialize(this, new DataSource((VoidPtr) entry++, hurtboxSize));
             }
         }
 
         public override int OnCalculateSize(bool force)
         {
             _lookupCount = 0;
-            return Children.Count * 0x20;
+            return Children.Count * hurtboxSize;
         }
 
         public override void OnRebuild(VoidPtr address, int length, bool force)
@@ -1098,7 +1251,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             _entryOffset = address;
             for (int i = 0; i < Children.Count; i++)
             {
-                Children[i].Rebuild(address + i * 0x20, 0x20, force);
+                Children[i].Rebuild(address + i * hurtboxSize, hurtboxSize, force);
             }
         }
     }
@@ -1663,12 +1816,12 @@ namespace BrawlLib.SSBB.ResourceNodes
         #endregion
     }
 
-    public unsafe class MoveDefSectionUnk1Node : MoveDefEntryNode
+    public unsafe class MoveDefFinalSmashAuraNode : MoveDefEntryNode
     {
         internal FDefMiscUnkType1* Start => (FDefMiscUnkType1*) WorkingUncompressed.Address;
         internal int Count;
 
-        public MoveDefSectionUnk1Node(int count)
+        public MoveDefFinalSmashAuraNode(int count)
         {
             Count = count;
         }
@@ -1685,7 +1838,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             FDefMiscUnkType1* header = Start;
             for (int i = 0; i < Count; i++)
             {
-                new MoveDefSectionsUnk1NodeEntry().Initialize(this, new DataSource((VoidPtr) header++, 0x14));
+                new MoveDefFinalSmashAuraEntry().Initialize(this, new DataSource((VoidPtr) header++, 0x14));
             }
         }
 
@@ -1705,7 +1858,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
     }
 
-    public unsafe class MoveDefSectionsUnk1NodeEntry : MoveDefEntryNode
+    public unsafe class MoveDefFinalSmashAuraEntry : MoveDefEntryNode
     {
         internal FDefMiscUnkType1* Header => (FDefMiscUnkType1*) WorkingUncompressed.Address;
         public override ResourceType ResourceFileType => ResourceType.Unknown;

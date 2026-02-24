@@ -244,7 +244,10 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
         private Panel panel2;
         public ListBox EventList;
 
-        public string[] iRequirements = new string[0];
+        public MoveDefNode currentMoveDef; //may replace with _mDef?
+
+        //public string[] iRequirements = new string[0];
+        //public string[] iRequirementsUniq = new string[0];
         public string[] iAirGroundStats = new string[0];
         public string[] iCollisionStats = new string[0];
 
@@ -297,9 +300,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
                 if (!called)
                 {
                     called = true;
-                    iRequirements = _targetNode.Root.iRequirements;
-                    iAirGroundStats = _targetNode.Root.iAirGroundStats;
-                    iCollisionStats = _targetNode.Root.iCollisionStats;
+                    currentMoveDef = _targetNode.Root;
                 }
 
                 MoveDef = TargetNode.Root;
@@ -644,9 +645,12 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             //if ((ext = _targetNode.Root.IsExternal((int)pointer)) != null || (ext = _targetNode.Root.IsExternal((int)parameter._data)) != null)
             //    return "External: " + ext.Name;
 
-            if (node._extNode != null)
+            if (node.list == 3)
             {
-                return "External: " + node._extNode.Name;
+                if (node.External)
+                    return "External: " + node._extNode.Name;
+                else
+                    node.list = 4; //if an external was removed before pointers were refreshed, force to null!
             }
 
             if (node.list == 4)
@@ -696,7 +700,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
                         grp = "SubRoutines";
                         name = _targetNode.Root._subRoutineList[node.index].Name;
                         break;
-                    case 3:
+                    case 3: //case 4:
                         return "External: " + _targetNode.Root.references.Children[node.index].Name;
                     case 5:
                         grp = "Screen Tints";
@@ -708,7 +712,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
                         break;
                 }
 
-                return name + (node.list >= 2 ? "" : " - " + t) + " in the " + grp + " list";
+                return name + " " + (node.list >= 2 ? "" : " - " + t) + " in the " + grp + " list";
             }
         }
 
@@ -804,20 +808,37 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
         //Return the requirement corresponding to the value passed.
         public string GetRequirement(long value)
         {
-            bool not = (value & 0x80000000) == 0x80000000;
-            long requirement = value & 0xFF;
+            bool not = ((value & 0x80000000) == 0x80000000);
+            long requirement = value & 0x7FFFFFFF;
+            bool isReqUniq = (requirement >= 9999) ? true : false;
+            string req;
 
-            if (requirement > iRequirements.Length)
+
+            if (!isReqUniq)
             {
-                return Helpers.Hex(requirement);
+                if (requirement > currentMoveDef.iRequirements.Length)
+                {
+                    return Helpers.Hex(requirement);
+                }
+                req = currentMoveDef.iRequirements[requirement];
+            }
+            else
+            {
+                long requirementAdjust = requirement - 9999;
+                if (requirementAdjust > currentMoveDef.iRequirementsUniq.Length)
+                {
+                    return Helpers.Hex(requirement);
+                }
+                req = currentMoveDef.iRequirementsUniq[requirementAdjust];
             }
 
+            
             if (not)
             {
-                return "Not " + iRequirements[requirement];
+                req = "Not " + req;
             }
 
-            return iRequirements[requirement];
+            return req;
         }
 
         public ActionEventInfo GetEventInfo(long id)
@@ -958,12 +979,15 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
         {
             if (EventList.SelectedIndex != -1)
             {
-                FormModifyEvent p = new FormModifyEvent();
+                FormModifyEvent p = new FormModifyEvent(this);
                 p.eventModifier1.origEvent = TargetNode.Children[EventList.SelectedIndex] as MoveDefEventNode;
+                p.eventModifier1.DisplayEvent(); //Why was this even disabled???
+                
                 if (p.ShowDialog() == DialogResult.OK)
                 {
                     MakeScript();
                 }
+                
             }
         }
 

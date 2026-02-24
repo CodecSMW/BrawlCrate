@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace BrawlLib.Internal.Windows.Forms.Moveset
 {
@@ -98,7 +99,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
 
         #endregion
 
-        public AttributeInfo[] AttributeArray;
+        public List<AttributeInfo> AttributeArray;
 
         public AttributeGrid2()
         {
@@ -145,7 +146,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
 
             for (int i = 0; i < 185; i++)
             {
-                if (i < AttributeArray.Length)
+                if (i < AttributeArray.Count)
                 {
                     attributes.Rows.Add(AttributeArray[i]._name);
                 }

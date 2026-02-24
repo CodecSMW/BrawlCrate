@@ -875,7 +875,6 @@ namespace BrawlLib.SSBB.ResourceNodes
             {
                 size += p.CalculateSize(true);
             }
-
             return size;
         }
 
@@ -901,7 +900,6 @@ namespace BrawlLib.SSBB.ResourceNodes
                 header->_list._startOffset = (int) address - (int) _rebuildBase;
                 _lookupOffsets.Add((int) (&header->_list)->_startOffset.Address - (int) _rebuildBase);
             }
-
             header->_list._listCount = Children.Count;
         }
     }

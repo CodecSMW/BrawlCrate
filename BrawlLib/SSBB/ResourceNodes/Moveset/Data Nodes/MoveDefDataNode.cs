@@ -1,5 +1,6 @@
 using BrawlLib.Internal;
 using BrawlLib.SSBB.Types;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +12,8 @@ namespace BrawlLib.SSBB.ResourceNodes
     {
         internal MovesetHeader* Header => (MovesetHeader*) WorkingUncompressed.Address;
 
-        public List<SpecialOffset> specialOffsets = new List<SpecialOffset>();
+        public List<SpecialOffset> specialOffsets = new List<SpecialOffset>(); 
+
         internal uint DataLen;
 
         private MovesetHeader hdr;
@@ -153,21 +155,20 @@ namespace BrawlLib.SSBB.ResourceNodes
         public MoveDefGroupNode _articleGroup;
 
         public MoveDefFlagsNode _animFlags;
-        public MoveDefAttributeNode attributes, sseAttributes;
+        public MoveDefSectionParamNode attributes, sseAttributes; //MoveDefAttributeNode
         public MoveDefMiscNode misc;
-        public MoveDefActionOverrideNode override1;
-        public MoveDefActionOverrideNode override2;
+        public MoveDefActionOverrideNode override1,override2;
         public MoveDefActionFlagsNode commonActionFlags, actionFlags;
         public MoveDefUnk7Node unk7;
         public MoveDefActionPreNode actionPre;
-        public MoveDefUnk22Node unk22;
+        public MoveDefExActionInterruptsNode unk22;
         public MoveDefUnk17Node boneFloats3;
         public MoveDefModelVisibilityNode mdlVisibility;
         public MoveDefUnk17Node boneFloats1, boneFloats2;
         public MoveDefArticleNode entryArticle;
         public MoveDefStaticArticleGroupNode staticArticles;
         public MoveDefActionInterruptsNode actionInterrupts;
-        public MoveDefUnk24Node unk24;
+        public MoveDefCharItemNode unk24;
         public MoveDefBoneIndicesNode boneRef1;
         public MoveDefBoneRef2Node boneRef2;
 
@@ -187,11 +188,11 @@ namespace BrawlLib.SSBB.ResourceNodes
         public Wario6 warioParams6;
         public int warioSwing4StringOffset = -1;
 
-        public List<MoveDefEntryNode> _extraEntries;
+        public Dictionary<int,MoveDefEntryNode> _extraEntries;
         public List<int> _extraOffsets;
         public List<int> ExtraOffsets => _extraOffsets;
 
-        public SortedList<int, MoveDefEntryNode> _articles;
+        public SortedList<int, MoveDefEntryNode> _articles, _extraParams, _extraUnique;
 
         public override bool OnInitialize()
         {
@@ -200,14 +201,17 @@ namespace BrawlLib.SSBB.ResourceNodes
             flags1 = Header->Flags1;
             flags2 = Header->Flags2;
             hdr = *Header;
-            _extraEntries = new List<MoveDefEntryNode>();
+            _extraEntries = new Dictionary<int, MoveDefEntryNode>();
             _extraOffsets = new List<int>();
             _articles = new SortedList<int, MoveDefEntryNode>();
+            _extraParams = new SortedList<int, MoveDefEntryNode>();
+            _extraUnique = new SortedList<int, MoveDefEntryNode>();
             //base.OnInitialize();
             bint* current = (bint*) Header;
             for (int i = 0; i < 27; i++)
             {
-                specialOffsets.Add(new SpecialOffset {Index = i, Offset = *current++ + (i == 2 ? 1 : 0)});
+                specialOffsets.Add(new SpecialOffset {Index = i, Offset = *current++ + (i == 2 ? 1 : 0) }); //TODO: Fix articles breaking this if i == 2 option is removed
+                //Offset = *current++ + (i == 2 ? 1 : 0) }
             }
 
             CalculateDataLen();
@@ -263,96 +267,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                         new DataSource(BaseAddress + specialOffsets[4].Offset, 0));
                 }
 
-                int amt = 0;
-
-                //The only way to compute the amount of extra offsets is broken by PSA.
-                //Using the exact amount will work for now until REL editing is available.
-                switch (RootNode.Name)
-                {
-                    case "FitZakoBall":
-                    case "FitZakoBoy":
-                    case "FitZakoGirl":
-                    case "FitZakoChild":
-                        amt = 1;
-                        break;
-                    case "FitPurin":
-                        amt = 3;
-                        break;
-                    case "FitKoopa":
-                    case "FitMetaknight":
-                        amt = 5;
-                        break;
-                    case "FitGanon":
-                    case "FitGKoopa":
-                    case "FitMarth":
-                        amt = 6;
-                        break;
-                    case "FitPokeFushigisou":
-                        amt = 7;
-                        break;
-                    case "FitCaptain":
-                    case "FitIke":
-                    case "FitLuigi":
-                    case "FitPokeLizardon":
-                    case "FitPokeTrainer":
-                    case "FitPokeZenigame":
-                    case "FitSonic":
-                        amt = 8;
-                        break;
-                    case "FitDonkey":
-                    case "FitSheik":
-                    case "FitWarioMan":
-                        amt = 9;
-                        break;
-                    case "FitMario":
-                    case "FitWario":
-                    case "FitZelda":
-                        amt = 10;
-                        break;
-                    case "FitFalco":
-                    case "FitLucario":
-                    case "FitPikachu":
-                        amt = 11;
-                        break;
-                    case "FitSZerosuit":
-                        amt = 12;
-                        break;
-                    case "FitDiddy":
-                    case "FitFox":
-                    case "FitLucas":
-                    case "FitPikmin":
-                    case "FitPit":
-                    case "FitWolf":
-                    case "FitYoshi":
-                        amt = 13;
-                        break;
-                    case "FitNess":
-                    case "FitPeach":
-                    case "FitRobot":
-                        amt = 14;
-                        break;
-                    case "FitDedede":
-                    case "FitGameWatch":
-                        amt = 16;
-                        break;
-                    case "FitPopo":
-                        amt = 18;
-                        break;
-                    case "FitLink":
-                    case "FitSnake":
-                    case "FitToonLink":
-                        amt = 20;
-                        break;
-                    case "FitSamus":
-                        amt = 22;
-                        break;
-                    case "FitKirby":
-                        amt = 68;
-                        break;
-                    default: //Only works on movesets untouched by PSA
-                        amt = (Size - 124) / 4;
-                        break;
-                }
+                int amt = ExtraOffsetCount();
 
                 bint* sPtr = (bint*) (BaseAddress + _offset + 124);
                 for (int i = 0; i < amt; i++)
@@ -360,10 +275,14 @@ namespace BrawlLib.SSBB.ResourceNodes
                     _extraOffsets.Add(*sPtr++);
                 }
 
-                (attributes = new MoveDefAttributeNode("Attributes") {offsetID = 2}).Initialize(this,
-                    new DataSource(BaseAddress + 0, 0x2E4));
-                (sseAttributes = new MoveDefAttributeNode("SSE Attributes") {offsetID = 3}).Initialize(this,
-                    new DataSource(BaseAddress + 0x2E4, 0x2E4));
+                (attributes = new MoveDefSectionParamNode("Attributes") { offsetID = 2 }).Initialize(this,
+                    new DataSource(BaseAddress + specialOffsets[2].Offset, 0x2E4));
+                (sseAttributes = new MoveDefSectionParamNode("SSE Attributes") { offsetID = 3 }).Initialize(this,
+                    new DataSource(BaseAddress + specialOffsets[3].Offset, 0x2E4));
+                //(attributes = new MoveDefAttributeNode("Attributes") {offsetID = 2}).Initialize(this,
+                //    new DataSource(BaseAddress + specialOffsets[2].Offset, 0x2E4));
+                //(sseAttributes = new MoveDefAttributeNode("SSE Attributes") {offsetID = 3}).Initialize(this,
+                //    new DataSource(BaseAddress + specialOffsets[3].Offset, 0x2E4));
                 if (specialOffsets[5].Size != 0)
                 {
                     (commonActionFlags = new MoveDefActionFlagsNode("Common Action Flags",
@@ -411,7 +330,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                     //Set up groups
                     for (int i = 0; i < count; i++)
                     {
-                        actions.AddChild(new MoveDefActionGroupNode {_name = "Action" + (i + 274), offsetID = i},
+                        actions.AddChild(new MoveDefActionGroupNode {_name = "Action " + Convert.ToString(i + 274, 16), offsetID = i},
                             false);
                     }
 
@@ -510,13 +429,13 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                 if (specialOffsets[24].Size != 0)
                 {
-                    (unk24 = new MoveDefUnk24Node {offsetID = 24}).Initialize(this,
+                    (unk24 = new MoveDefCharItemNode {offsetID = 24}).Initialize(this,
                         BaseAddress + specialOffsets[24].Offset, 8);
                 }
 
                 if (specialOffsets[22].Size != 0)
                 {
-                    (unk22 = new MoveDefUnk22Node {offsetID = 22}).Initialize(this,
+                    (unk22 = new MoveDefExActionInterruptsNode {offsetID = 22}).Initialize(this,
                         new DataSource(BaseAddress + specialOffsets[22].Offset, 0));
                 }
 
@@ -575,174 +494,20 @@ namespace BrawlLib.SSBB.ResourceNodes
                         new DataSource(BaseAddress + specialOffsets[21].Offset, 0));
                 }
 
+                //FighterSpecificParams();
+
                 //These offsets follow no patterns
                 int y = 0;
                 MoveDefExternalNode ext = null;
                 foreach (int DataOffset in _extraOffsets)
                 {
-                    if (y == 2 && RootNode.Name == "FitPokeTrainer")
+                    if (UniqueParameter(DataOffset,y)) //Moved to organize
                     {
-                        MoveDefSoundDatasNode p = new MoveDefSoundDatasNode
-                            {isExtra = true, separate = true, _name = "Sound Data 2"};
-                        p.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(p);
+                        continue;
                     }
-                    else if (y == 49 && RootNode.Name == "FitKirby")
+                    else if (NanaSubactions(DataOffset,y)) //Moved to organize
                     {
-                        MoveDefKirbyParamList49Node p = new MoveDefKirbyParamList49Node {isExtra = true, offsetID = y};
-                        p.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(p);
-                    }
-                    else if (y == 50 && RootNode.Name == "FitKirby")
-                    {
-                        //6 offsets
-                        //that point to:
-                        //offset
-                        //count
-                        //align to 0x10
-                        //that points to list of:
-                        //offset
-                        //align list to 0x10
-                        //that points to:
-                        //offset
-                        //count
-                        //offset (sometimes 0)
-                        //count (sometimes 0)
-                        //that points to list of:
-                        //offset
-                        //count
-                        //align list to 0x10
-                        //that points to:
-                        //int value
-                    }
-                    else if ((y == 51 || y == 52) && RootNode.Name == "FitKirby")
-                    {
-                        MoveDefKirbyParamList5152Node p = new MoveDefKirbyParamList5152Node
-                            {isExtra = true, offsetID = y};
-                        p.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(p);
-                    }
-                    else if (y == 7 && RootNode.Name == "FitPit" || y == 13 && RootNode.Name == "FitRobot")
-                    {
-                        Pit7Robot13Node p = new Pit7Robot13Node {isExtra = true, offsetID = y};
-                        p.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(p);
-                    }
-                    else if (y == 8 && RootNode.Name == "FitLucario")
-                    {
-                        HitDataListOffsetNode p = new HitDataListOffsetNode
-                            {isExtra = true, _name = "HitDataList" + y, offsetID = y};
-                        p.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(p);
-                    }
-                    else if (y > 9 && RootNode.Name == "FitYoshi")
-                    {
-                        Yoshi9 p = new Yoshi9 {isExtra = true, offsetID = y};
-                        p.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(p);
-                    }
-                    else if (y == 15 && RootNode.Name == "FitDedede")
-                    {
-                        Data2ListNode p = new Data2ListNode {isExtra = true, offsetID = y};
-                        p.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(p);
-                    }
-                    else if (
-                        y == 56 && RootNode.Name == "FitKirby" ||
-                        y == 7 && RootNode.Name == "FitLink" ||
-                        y == 8 && RootNode.Name == "FitPeach" ||
-                        y == 4 && RootNode.Name == "FitPit" ||
-                        y == 7 && RootNode.Name == "FitToonLink")
-                    {
-                        MoveDefHitDataListNode p = new MoveDefHitDataListNode
-                            {isExtra = true, _name = "HitDataList" + y, offsetID = y};
-                        p.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(p);
-                    }
-                    else if (y == 6 && RootNode.Name.StartsWith("FitWario"))
-                    {
-                        warioParams6 = new Wario6 {isExtra = true, offsetID = y};
-                        warioParams6.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(warioParams6);
-                    }
-                    else if (y == 8 && RootNode.Name.StartsWith("FitWario"))
-                    {
-                        warioParams8 = new Wario8 {isExtra = true, offsetID = y};
-                        warioParams8.Initialize(this, new DataSource(BaseAddress + DataOffset, 0));
-                        _extraEntries.Add(warioParams8);
-                    }
-                    else if (y == 8 && RootNode.Name == "FitSZerosuit")
-                    {
-                        (zssParams8 = new SZerosuitExtraParams8Node {isExtra = true, offsetID = y}).Initialize(this,
-                            BaseAddress + DataOffset, 32);
-                        _extraEntries.Add(zssParams8);
-                    }
-                    else if (y < 4 && RootNode.Name == "FitPopo")
-                    {
-                        _extraEntries.Add(null);
-
-                        if (y == 0)
-                        {
-                            nanaSubActions = new MoveDefActionListNode
-                                {_name = "Nana SubAction Scripts", isExtra = true};
-                        }
-
-                        actionOffset = (bint*) (BaseAddress + DataOffset);
-                        ActionOffsets = new List<int>();
-                        for (int x = 0; x < Root.GetSize(DataOffset) / 4; x++)
-                        {
-                            ActionOffsets.Add(actionOffset[x]);
-                        }
-
-                        nanaSubActions.ActionOffsets.Add(ActionOffsets);
-
-                        if (y == 3)
-                        {
-                            string name;
-                            int count = 0;
-                            for (int i = 0; i < 4; i++)
-                            {
-                                if ((count = Root.GetSize(DataOffset) / 4) > 0)
-                                {
-                                    break;
-                                }
-                            }
-
-                            //Initialize using first offset so the node is sorted correctly
-                            nanaSubActions.Initialize(this, BaseAddress + _extraOffsets[0], 0);
-
-                            //Set up groups
-                            for (int i = 0; i < count; i++)
-                            {
-                                if (_animFlags._names.Count > i && _animFlags._flags[i]._stringOffset > 0)
-                                {
-                                    name = _animFlags._names[i];
-                                }
-                                else
-                                {
-                                    name = "<null>";
-                                }
-
-                                nanaSubActions.AddChild(
-                                    new MoveDefSubActionGroupNode
-                                    {
-                                        _name = name, _flags = _animFlags._flags[i]._Flags,
-                                        _inTransTime = _animFlags._flags[i]._InTranslationTime
-                                    }, false);
-                            }
-
-                            //Add children
-                            for (int i = 0; i < 4; i++)
-                            {
-                                PopulateActionGroup(nanaSubActions, nanaSubActions.ActionOffsets[i], true, i);
-                            }
-                        }
-                    }
-                    else if (y == 10 && RootNode.Name == "FitPopo")
-                    {
-                        (nanaSoundData = new MoveDefSoundDatasNode {_name = "Nana Sound Data", isExtra = true})
-                            .Initialize(this, (VoidPtr) Header + 124 + y * 4, 8);
-                        _extraEntries.Add(null);
+                        continue;
                     }
                     else
                     {
@@ -763,11 +528,11 @@ namespace BrawlLib.SSBB.ResourceNodes
                                     if (y < _extraOffsets.Count - 1 && (o = _extraOffsets[y + 1]) < 1480 && o > 1)
                                     {
                                         MoveDefRawDataNode d = new MoveDefRawDataNode("ExtraParams" + y)
-                                            {offsetID = y, isExtra = true};
+                                        { offsetID = y, isExtra = true };
                                         d.Initialize(this, BaseAddress + DataOffset, 0);
                                         for (int i = 0; i < o; i++)
                                         {
-                                            new MoveDefSectionParamNode {_name = "Part" + i, _extOverride = i == 0}
+                                            new MoveDefSectionParamNode { _name = "Part" + i, _extOverride = i == 0 }
                                                 .Initialize(d, BaseAddress + DataOffset + d.Size / o * i, d.Size / o);
                                         }
 
@@ -776,14 +541,14 @@ namespace BrawlLib.SSBB.ResourceNodes
                                     else
                                     {
                                         MoveDefSectionParamNode p = new MoveDefSectionParamNode
-                                            {_name = "ExtraParams" + y, isExtra = true, offsetID = y};
+                                        { _name = "ExtraParams" + y, isExtra = true, offsetID = y };
                                         p.Initialize(this, BaseAddress + DataOffset, 0);
                                         entry = p;
                                     }
                                 }
                                 else
                                 {
-                                    Article* test = (Article*) (BaseAddress + DataOffset);
+                                    Article* test = (Article*)(BaseAddress + DataOffset);
                                     if (Root.GetSize(DataOffset) < 52 ||
                                         test->_actionsStart > Root.dataSize || test->_actionsStart % 4 != 0 ||
                                         test->_subactionFlagsStart > Root.dataSize ||
@@ -798,11 +563,11 @@ namespace BrawlLib.SSBB.ResourceNodes
                                         if (y < _extraOffsets.Count - 1 && (o = _extraOffsets[y + 1]) < 1480 && o > 1)
                                         {
                                             MoveDefRawDataNode d = new MoveDefRawDataNode("ExtraParams" + y)
-                                                {offsetID = y, isExtra = true};
+                                            { offsetID = y, isExtra = true };
                                             d.Initialize(this, BaseAddress + DataOffset, 0);
                                             for (int i = 0; i < o; i++)
                                             {
-                                                new MoveDefSectionParamNode {_name = "Part" + i, _extOverride = i == 0}
+                                                new MoveDefSectionParamNode { _name = "Part" + i, _extOverride = i == 0 }
                                                     .Initialize(d,
                                                         BaseAddress + DataOffset + d.Size / o * i, d.Size / o);
                                             }
@@ -812,21 +577,22 @@ namespace BrawlLib.SSBB.ResourceNodes
                                         else
                                         {
                                             MoveDefSectionParamNode p = new MoveDefSectionParamNode
-                                                {_name = "ExtraParams" + y, isExtra = true, offsetID = y};
+                                            { _name = "ExtraParams" + y, isExtra = true, offsetID = y };
                                             p.Initialize(this, BaseAddress + DataOffset, 0);
                                             entry = p;
                                         }
+                                        _extraParams.Add(entry._offset, entry);
                                     }
                                     else
                                     {
                                         if (_articleGroup == null)
                                         {
-                                            _articleGroup = new MoveDefGroupNode {_name = "Articles"};
+                                            _articleGroup = new MoveDefGroupNode { _name = "Articles" };
                                             _articleGroup.Initialize(this, BaseAddress + DataOffset, 0);
                                         }
 
                                         (entry = new MoveDefArticleNode
-                                                {offsetID = y, Static = true, isExtra = true, extraOffset = true})
+                                        { offsetID = y, Static = true, isExtra = true, extraOffset = true })
                                             .Initialize(_articleGroup, BaseAddress + DataOffset, 0);
                                         _articles.Add(entry._offset, entry);
                                     }
@@ -834,7 +600,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                             }
                             else
                             {
-                                Article* test = (Article*) (BaseAddress + DataOffset);
+                                Article* test = (Article*)(BaseAddress + DataOffset);
                                 if (Root.GetSize(DataOffset) < 52 ||
                                     test->_actionsStart > Root.dataSize || test->_actionsStart % 4 != 0 ||
                                     test->_subactionFlagsStart > Root.dataSize || test->_subactionFlagsStart % 4 != 0 ||
@@ -848,11 +614,11 @@ namespace BrawlLib.SSBB.ResourceNodes
                                     if (y < _extraOffsets.Count - 1 && (o = _extraOffsets[y + 1]) < 1480 && o > 1)
                                     {
                                         MoveDefRawDataNode d = new MoveDefRawDataNode("ExtraParams" + y)
-                                            {offsetID = y, isExtra = true};
+                                        { offsetID = y, isExtra = true };
                                         d.Initialize(this, BaseAddress + DataOffset, 0);
                                         for (int i = 0; i < o; i++)
                                         {
-                                            new MoveDefSectionParamNode {_name = "Part" + i, _extOverride = i == 0}
+                                            new MoveDefSectionParamNode { _name = "Part" + i, _extOverride = i == 0 }
                                                 .Initialize(d, BaseAddress + DataOffset + d.Size / o * i, d.Size / o);
                                         }
 
@@ -861,27 +627,28 @@ namespace BrawlLib.SSBB.ResourceNodes
                                     else
                                     {
                                         MoveDefSectionParamNode p = new MoveDefSectionParamNode
-                                            {_name = "ExtraParams" + y, isExtra = true, offsetID = y};
+                                        { _name = "ExtraParams" + y, isExtra = true, offsetID = y }; //Where ExtraParams0-4 are made
                                         p.Initialize(this, BaseAddress + DataOffset, 0);
                                         entry = p;
                                     }
+                                    _extraParams.Add(entry._offset, entry);
                                 }
                                 else
                                 {
                                     if (_articleGroup == null)
                                     {
-                                        _articleGroup = new MoveDefGroupNode {_name = "Articles"};
+                                        _articleGroup = new MoveDefGroupNode { _name = "Articles" };
                                         _articleGroup.Initialize(this, BaseAddress + DataOffset, 0);
                                     }
 
                                     (entry = new MoveDefArticleNode
-                                            {offsetID = y, isExtra = true, Static = true, extraOffset = true})
+                                    { offsetID = y, isExtra = true, Static = true, extraOffset = true })
                                         .Initialize(_articleGroup, BaseAddress + DataOffset, 0);
                                     _articles.Add(entry._offset, entry);
                                 }
                             }
 
-                            _extraEntries.Add(entry);
+                            _extraEntries.Add(y, entry);
                         }
                     }
 
@@ -940,9 +707,246 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             #endregion
 
-            SortChildren();
+            //SortChildren();
         }
 
+        public bool UniqueParameter(int DataOffset, int index)
+        {
+            MoveDefEntryNode p;
+            int size = 0;
+            if (index == 2 && RootNode.Name == "FitPokeTrainer")
+                p = new MoveDefSoundDatasNode { separate = true, _name = "Sound Data 2" };
+            else if (index == 49 && RootNode.Name == "FitKirby")
+                p = new MoveDefKirbyParamList49Node();
+            /*else if (index == 50 && RootNode.Name == "FitKirby") //TODO
+            {
+                //6 offsets
+                //that point to:
+                //offset
+                //count
+                //align to 0x10
+                //that points to list of:
+                //offset
+                //align list to 0x10
+                //that points to:
+                //offset
+                //count
+                //offset (sometimes 0)
+                //count (sometimes 0)
+                //that points to list of:
+                //offset
+                //count
+                //align list to 0x10
+                //that points to:
+                //int value
+            }
+            */
+            else if ((index == 51 || index == 52) && RootNode.Name == "FitKirby")
+                p = new MoveDefKirbyParamList5152Node();
+            else if (index == 7 && RootNode.Name == "FitPit" || index == 13 && RootNode.Name == "FitRobot")
+                p = new Pit7Robot13Node();
+            else if (index == 8 && RootNode.Name == "FitLucario")
+                p = new HitDataListOffsetNode { _name = "HitDataList " + index };
+            else if (index > 9 && RootNode.Name == "FitYoshi")
+                p = new Yoshi9();
+            else if (index == 15 && RootNode.Name == "FitDedede")
+                p = new Data2ListNode();
+            else if (index == 56 && RootNode.Name == "FitKirby" ||
+                index == 7 && RootNode.Name == "FitLink" ||
+                index == 8 && RootNode.Name == "FitPeach" ||
+                index == 4 && RootNode.Name == "FitPit" ||
+                index == 7 && RootNode.Name == "FitToonLink")
+                p = new MoveDefHitDataListNode { _name = "HitDataList " + index };
+            else if (index == 6 && RootNode.Name.StartsWith("FitWario"))
+                p = new Wario6(); //warioParams6
+            else if (index == 8 && RootNode.Name.StartsWith("FitWario"))
+                p = new Wario8(); //warioParams8
+            else if (index == 8 && RootNode.Name == "FitSZerosuit")
+            {
+                p = new SZerosuitExtraParams8Node(); //zssParams8
+                size = 32; //only this and the below need to enforce size?
+            }
+            else if (index == 10 && RootNode.Name == "FitPopo") //Nana sound info
+            {
+                (nanaSoundData = new MoveDefSoundDatasNode { _name = "Nana Sound Data", isExtra = true })
+                    .Initialize(this, (VoidPtr)Header + 124 + index * 4, 8);
+                _extraEntries.Add(index, null);
+                return true;
+            }
+            else
+                return false;
+            p.isExtra = true;
+            p.offsetID = index;
+            p.Initialize(this, new DataSource(BaseAddress + DataOffset, size));
+            _extraEntries.Add(index, p);
+            _extraUnique.Add(index, p);
+            return true;
+        }
+        
+        public bool NanaSubactions(int DataOffset, int y)
+        {
+            if (y < 4 && RootNode.Name == "FitPopo")
+            {
+                _extraEntries.Add(y, null);
+
+                if (y == 0)
+                {
+                    nanaSubActions = new MoveDefActionListNode
+                    { _name = "Nana SubAction Scripts", isExtra = true };
+                }
+
+                bint* actionOffset = (bint*)(BaseAddress + DataOffset);
+                List<int> ActionOffsets = new List<int>();
+                for (int x = 0; x < Root.GetSize(DataOffset) / 4; x++)
+                {
+                    ActionOffsets.Add(actionOffset[x]);
+                }
+
+                nanaSubActions.ActionOffsets.Add(ActionOffsets);
+
+                if (y == 3)
+                {
+                    string name;
+                    int count = 0;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if ((count = Root.GetSize(DataOffset) / 4) > 0)
+                        {
+                            break;
+                        }
+                    }
+
+                    //Initialize using first offset so the node is sorted correctly
+                    nanaSubActions.Initialize(this, BaseAddress + _extraOffsets[0], 0);
+
+                    //Set up groups
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (_animFlags._names.Count > i && _animFlags._flags[i]._stringOffset > 0)
+                        {
+                            name = _animFlags._names[i];
+                        }
+                        else
+                        {
+                            name = "<null>";
+                        }
+
+                        nanaSubActions.AddChild(
+                            new MoveDefSubActionGroupNode
+                            {
+                                _name = name,
+                                _flags = _animFlags._flags[i]._Flags,
+                                _inTransTime = _animFlags._flags[i]._InTranslationTime
+                            }, false);
+                    }
+
+                    //Add children
+                    for (int i = 0; i < 4; i++)
+                    {
+                        PopulateActionGroup(nanaSubActions, nanaSubActions.ActionOffsets[i], true, i);
+                    }
+                }
+                return true;
+            }
+            else
+                return false;
+        }
+        public int ExtraOffsetCount()
+        {
+            //The only way to compute the amount of extra offsets is broken by PSA.
+            //Using the exact amount will work for now until REL editing is available.
+            int amt = 0;
+            switch (RootNode.Name)
+            {
+                case "FitZakoBall":
+                case "FitZakoBoy":
+                case "FitZakoGirl":
+                case "FitZakoChild":
+                    amt = 1;
+                    break;
+                case "FitPurin":
+                    amt = 3;
+                    break;
+                case "FitKoopa":
+                case "FitMetaknight":
+                    amt = 5;
+                    break;
+                case "FitGanon":
+                case "FitGKoopa":
+                case "FitMarth":
+                    amt = 6;
+                    break;
+                case "FitPokeFushigisou":
+                    amt = 7;
+                    break;
+                case "FitCaptain":
+                case "FitIke":
+                case "FitLuigi":
+                case "FitPokeLizardon":
+                case "FitPokeTrainer":
+                case "FitPokeZenigame":
+                case "FitSonic":
+                    amt = 8;
+                    break;
+                case "FitDonkey":
+                case "FitSheik":
+                case "FitWarioMan":
+                    amt = 9;
+                    break;
+                case "FitMario":
+                case "FitWario":
+                case "FitZelda":
+                    amt = 10;
+                    break;
+                case "FitFalco":
+                case "FitLucario":
+                case "FitPikachu":
+                    amt = 11;
+                    break;
+                case "FitSZerosuit":
+                    amt = 12;
+                    break;
+                case "FitDiddy":
+                case "FitFox":
+                case "FitLucas":
+                case "FitPikmin":
+                case "FitPit":
+                case "FitWolf":
+                case "FitYoshi":
+                    amt = 13;
+                    break;
+                case "FitNess":
+                case "FitPeach":
+                case "FitRobot":
+                    amt = 14;
+                    break;
+                case "FitDedede":
+                case "FitGameWatch":
+                    amt = 16;
+                    break;
+                case "FitPopo":
+                    amt = 18;
+                    break;
+                case "FitLink":
+                case "FitSnake":
+                case "FitToonLink":
+                    amt = 20;
+                    break;
+                case "FitSamus":
+                    amt = 22;
+                    break;
+                case "FitKirby":
+                    amt = 68;
+                    break;
+                default: //Only works on movesets untouched by PSA
+                    amt = (Size - 124) / 4;
+                    break;
+            }
+            return amt;
+        }
+            
+                
+        
         private void CalculateDataLen()
         {
             List<SpecialOffset> sorted = specialOffsets.OrderBy(x => x.Offset).ToList();

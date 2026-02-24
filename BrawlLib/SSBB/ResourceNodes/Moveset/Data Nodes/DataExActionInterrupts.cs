@@ -4,13 +4,13 @@ using System.ComponentModel;
 
 namespace BrawlLib.SSBB.ResourceNodes
 {
-    public unsafe class MoveDefUnk22Node : MoveDefEntryNode
+    public unsafe class MoveDefExActionInterruptsNode : MoveDefEntryNode
     {
         internal FDefUnk22* Header => (FDefUnk22*) WorkingUncompressed.Address;
 
         private int _unk1, _unk2, _actionOffset;
 
-        [Category("Unknown Offset 22")]
+        [Category("Extra Action Interrupts")]
         public int Unknown1
         {
             get => _unk1;
@@ -21,7 +21,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
-        [Category("Unknown Offset 22")]
+        [Category("Extra Action Interrupts")]
         public int Unknown2
         {
             get => _unk2;
@@ -32,12 +32,12 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
-        [Category("Unknown Offset 22")] public int ActionOffset => _actionOffset;
+        [Category("Extra Action Interrupts")] public int ActionOffset => _actionOffset;
 
         public override bool OnInitialize()
         {
             base.OnInitialize();
-            _name = "Unknown 22";
+            _name = "Extra Action Interrupts";
 
             _unk1 = Header->_unk1;
             _unk2 = Header->_unk2;

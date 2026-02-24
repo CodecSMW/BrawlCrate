@@ -3,7 +3,7 @@ using BrawlLib.SSBB.Types;
 
 namespace BrawlLib.SSBB.ResourceNodes
 {
-    public unsafe class MoveDefUnk24Node : MoveDefEntryNode
+    public unsafe class MoveDefCharItemNode : MoveDefEntryNode
     {
         internal FDefListOffset* Header => (FDefListOffset*) WorkingUncompressed.Address;
         internal int i = 0;
@@ -16,7 +16,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             base.OnInitialize();
             if (_name == null)
             {
-                _name = "Unknown 24";
+                _name = "Character Item Bres IDs";
             }
 
             return Count > 0;

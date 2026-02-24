@@ -18,7 +18,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             base.OnInitialize();
             if (_name == null)
             {
-                _name = "Unknown 7";
+                _name = "Extra Action Flags";
             }
 
             return Count > 0;

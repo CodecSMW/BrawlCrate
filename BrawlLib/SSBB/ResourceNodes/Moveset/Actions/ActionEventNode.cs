@@ -190,6 +190,13 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
+        private string GetParameter(ActionEventInfo info, int index, string defaultParam = "Value")
+        {
+            if (info != null && info.Params != null && index < info.Params.Length)
+                return info.Params[index];
+            else
+                return defaultParam;
+        }
         public MoveDefEntryNode NewParam(int i, int value, int typeOverride)
         {
             MoveDefEntryNode child = null;
@@ -208,68 +215,63 @@ namespace BrawlLib.SSBB.ResourceNodes
             {
                 if ((_event == 0x06000D00 || _event == 0x06150F00 || _event == 0x062B0D00) && i == 12)
                 {
-                    child = new HitboxFlagsNode(info != null && i < info.Params.Length ? info.Params[i] : "Value")
+                    child = new HitboxFlagsNode(GetParameter(info,i))
                         {_value = value, val = new HitboxFlags {data = value}};
                     (child as HitboxFlagsNode).GetFlags();
                 }
                 else if ((_event == 0x06000D00 || _event == 0x06150F00 || _event == 0x062B0D00) &&
                          (i == 0 || i == 3 || i == 4))
                 {
-                    child = new MoveDefEventValue2HalfNode(info != null && i < info.Params.Length
-                        ? info.Params[i]
-                        : "Value") {_value = value};
+                    child = new MoveDefEventValue2HalfNode(GetParameter(info, i))
+                    { _value = value};
                 }
                 else if ((_event == 0x11150300 || _event == 0x11001000 || _event == 0x11010A00 ||
                           _event == 0x11020A00) && i == 0)
                 {
-                    child = new MoveDefEventValue2HalfGFXNode(info != null && i < info.Params.Length
-                        ? info.Params[i]
-                        : "Value") {_value = value};
+                    child = new MoveDefEventValue2HalfGFXNode(GetParameter(info, i))
+                    { _value = value};
                 }
                 else if (i == 14 && _event == 0x06150F00)
                 {
                     child =
-                        new SpecialHitboxFlagsNode(info != null && i < info.Params.Length ? info.Params[i] : "Value")
-                            {_value = value, val = new SpecialHitboxFlags {data = value}};
+                        new SpecialHitboxFlagsNode(GetParameter(info, i))
+                        { _value = value, val = new SpecialHitboxFlags {data = value}};
                     (child as SpecialHitboxFlagsNode).GetFlags();
                 }
                 else //Not a special value
                 {
                     if (EventInfo?.Enums != null && EventInfo.Enums.ContainsKey(i))
                     {
-                        child = new MoveDefEventValueEnumNode(info != null && i < info.Params.Length
-                            ? info.Params[i]
-                            : "Value") {Enums = EventInfo.Enums[i].ToArray()};
+                        child = new MoveDefEventValueEnumNode(GetParameter(info, i))
+                        { Enums = EventInfo.Enums[i].ToArray()};
                     }
                     else
                     {
-                        child = new MoveDefEventValueNode(info != null && i < info.Params.Length
-                            ? info.Params[i]
-                            : "Value") {_value = value};
+                        child = new MoveDefEventValueNode(GetParameter(info, i))
+                        { _value = value};
                     }
                 }
             }
             else if ((ArgVarType) (int) type == ArgVarType.Scalar)
             {
-                child = new MoveDefEventScalarNode(info != null && i < info.Params.Length ? info.Params[i] : "Scalar")
+                child = new MoveDefEventScalarNode(GetParameter(info, i,"Scalar"))
                     {_value = value};
             }
             else if ((ArgVarType) (int) type == ArgVarType.Boolean)
             {
-                child = new MoveDefEventBoolNode(info != null && i < info.Params.Length ? info.Params[i] : "Boolean")
+                child = new MoveDefEventBoolNode(GetParameter(info, i,"Boolean"))
                     {_value = value};
             }
             else if ((ArgVarType) (int) type == ArgVarType.Unknown)
             {
-                child = new MoveDefEventUnkNode(info != null && i < info.Params.Length ? info.Params[i] : "Unknown")
+                child = new MoveDefEventUnkNode(GetParameter(info, i,"Unknown"))
                     {_value = value};
             }
             else if ((ArgVarType) (int) type == ArgVarType.Requirement)
             {
                 MoveDefEventRequirementNode r =
-                    new MoveDefEventRequirementNode(info != null && i < info.Params.Length
-                        ? info.Params[i]
-                        : "Requirement") {_value = value};
+                    new MoveDefEventRequirementNode(GetParameter(info, i,"Requirement"))
+                    {_value = value};
                 child = r;
                 r._parent = Root;
                 r.val = r.GetRequirement(r._value);
@@ -277,7 +279,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             else if ((ArgVarType) (int) type == ArgVarType.Variable)
             {
                 MoveDefEventVariableNode v =
-                    new MoveDefEventVariableNode(info != null && i < info.Params.Length ? info.Params[i] : "Variable")
+                    new MoveDefEventVariableNode(GetParameter(info, i,"Variable"))
                         {_value = value};
                 child = v;
                 v._parent = Root;
@@ -285,7 +287,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
             else if ((ArgVarType) (int) type == ArgVarType.Offset)
             {
-                child = new MoveDefEventOffsetNode(info != null && i < info.Params.Length ? info.Params[i] : "Offset")
+                child = new MoveDefEventOffsetNode(GetParameter(info, i,"Offset"))
                     {_value = value};
             }
 
@@ -359,6 +361,18 @@ namespace BrawlLib.SSBB.ResourceNodes
             set => arguments = value;
         }
 
+        public void Replace(MoveDefEventNode replacementInfo, bool replaceEvent = true)
+        {
+            if (replaceEvent)
+                EventID = replacementInfo.EventID;
+            NewChildren();
+            for (int i = 0; i < replacementInfo.Children.Count;i++)
+            {
+                if (Children.Count <= i)
+                    break;
+                _children[i] = replacementInfo._children[i];
+            }
+        }
         public override bool OnInitialize()
         {
             if ((int) Header == (int) BaseAddress)
@@ -509,10 +523,12 @@ namespace BrawlLib.SSBB.ResourceNodes
                         int list, index, type;
                         Root.GetLocation(offset, out list, out type, out index);
 
-                        if (list == 4) //Offset not found in existing nodes
+                        if (list == 4 && !Root._subRoutines.ContainsKey(offset)) //Offset not found in existing nodes
                         {
                             Root._subRoutines[offset] =
-                                a = new MoveDefActionNode("SubRoutine" + Root._subRoutineList.Count, false, null);
+                                a = new MoveDefActionNode("SubRoutine? " 
+                                + Convert.ToString(Root._subRoutineList.Count, 16).ToUpper(), false, null);
+                            //TODO: Figure out what makes THESE different. "SubRoutine"
                             a.Initialize(Root._subRoutineGroup, new DataSource((sbyte*) BaseAddress + offset, 8));
                             //if (offset != (Parent as MoveDefEntryNode)._offset)
                             //    a.Populate();
@@ -521,6 +537,10 @@ namespace BrawlLib.SSBB.ResourceNodes
                         else
                         {
                             MoveDefActionNode n = Root.GetAction(list, type, index);
+                            if (n is null)
+                            {
+                                int fire1 = 1;
+                            }
                             n?._actionRefs.Add(this);
                         }
                     }

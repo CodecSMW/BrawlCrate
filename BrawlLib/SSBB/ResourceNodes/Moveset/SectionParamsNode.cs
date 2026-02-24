@@ -2,6 +2,7 @@
 using BrawlLib.SSBB.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows.Markup;
 
 namespace BrawlLib.SSBB.ResourceNodes
 {
@@ -12,6 +13,11 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public List<AttributeInfo> _info;
         public string OldName;
+
+        public MoveDefSectionParamNode(string name = "<null>")
+        {
+            _name = name;
+        }
 
         public override string Name
         {
@@ -38,7 +44,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         private UnsafeBuffer attributeBuffer;
 
-        [Browsable(false)]
+        //[Browsable(false)]
         public UnsafeBuffer AttributeBuffer
         {
             get
@@ -54,18 +60,8 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public Dictionary<int, FDefListOffset> offsets;
 
-        public override bool OnInitialize()
+        public void RefreshSectionDesc()
         {
-            offsets = new Dictionary<int, FDefListOffset>();
-
-            OldName = _name;
-
-            base.OnInitialize();
-
-            if (Size == 0)
-            {
-                SetSizeInternal(4);
-            }
 
             SectionParamInfo data = null;
             if (Parent is MoveDefArticleNode)
@@ -104,7 +100,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             {
                 data = Root.Params[Name];
                 _info = data._attributes;
-                if (!string.IsNullOrEmpty(data._newName))
+                if (!string.IsNullOrEmpty(data._newName) && data._newName != "Attributes" && !data._newName.Contains("IC-Basics"))
                 {
                     _name = data._newName;
                 }
@@ -115,8 +111,8 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
 
             attributeBuffer = new UnsafeBuffer(Size);
-            byte* pOut = (byte*) attributeBuffer.Address;
-            byte* pIn = (byte*) Header;
+            byte* pOut = (byte*)attributeBuffer.Address;
+            byte* pIn = (byte*)Header;
 
             //if (String.IsNullOrEmpty(_name = new String((sbyte*)Header)))
             //    _name = OldName;
@@ -130,8 +126,8 @@ namespace BrawlLib.SSBB.ResourceNodes
                         AttributeInfo info = new AttributeInfo();
 
                         //Guess
-                        if ((((uint) *(buint*) pIn >> 24) & 0xFF) != 0 && *(bint*) pIn != -1 &&
-                            !float.IsNaN((float) *(bfloat*) pIn))
+                        if ((((uint)*(buint*)pIn >> 24) & 0xFF) != 0 && *(bint*)pIn != -1 &&
+                            !float.IsNaN((float)*(bfloat*)pIn))
                         {
                             info._type = 0;
                         }
@@ -142,7 +138,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                         info._name = (info._type == 1 ? "*" : "" + (info._type > 3 ? "+" : "")) + "0x" +
                                      i.ToString("X");
-                        info._description = "No Description Available.";
+                        info._description = "No Description Available Now.";
 
                         _info.Add(info);
                     }
@@ -182,6 +178,22 @@ namespace BrawlLib.SSBB.ResourceNodes
                 *pOut++ = *pIn++;
             }
 
+        }
+        public override bool OnInitialize()
+        {
+            offsets = new Dictionary<int, FDefListOffset>();
+
+            OldName = _name;
+
+            base.OnInitialize();
+
+            if (Size == 0)
+            {
+                SetSizeInternal(4);
+            }
+            RefreshSectionDesc();
+            SectionParamInfo data = null;
+ 
             if (Parent is MoveDefArticleNode)
             {
                 string id = (Parent as MoveDefArticleNode).ArticleStringID + "/" + _name;
@@ -298,7 +310,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             //        foreach (MoveDefEntryNode p in Children)
             //            RebuildChildren(this, i, ref addr);
             //}
-
+            //_calcSize = attributeBuffer.Length;
             _entryOffset = address;
             byte* pIn = (byte*) attributeBuffer.Address;
             byte* pOut = (byte*) address;
@@ -351,6 +363,18 @@ namespace BrawlLib.SSBB.ResourceNodes
             //    _entryLength += p.CalculateSize(true);
             return _entryLength;
         }
+    }
+    public class SectionParamInfo //TODO: remove from Helpers.cs
+    {
+        public string _newName;
+        public List<AttributeInfo> _attributes;
+
+        public SectionParamInfo(string name = "", List<AttributeInfo> attributes = null)
+        {
+            _newName = name;
+            _attributes = attributes;
+        }
+
     }
 
     public class SectionDataGroupNode : MoveDefEntryNode
