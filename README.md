@@ -18,7 +18,7 @@ Features PSAC does not have:
 
 Fighter.Pac: 
   100% Readadable (including Screen Tint and Flash Overlay support as well as external subroutines)
-  100% Compiling
+  100% Compiling (Warning: PM codes exist that directly inject into those files. They need to ALL be removed or ported simultaneously to have a changed pac file work and the heap sized accordingly!)
   Supports renaming actions and subroutines.
 
 Fighter Pac Files:
