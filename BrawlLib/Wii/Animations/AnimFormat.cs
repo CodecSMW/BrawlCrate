@@ -1,8 +1,13 @@
 ﻿using BrawlLib.SSBB.ResourceNodes;
+using BrawlLib.SSBB.Types;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Hashing;
+using System.Numerics;
+using System.Security.Policy;
 using System.Windows.Forms;
 
 namespace BrawlLib.Wii.Animations
@@ -104,6 +109,8 @@ namespace BrawlLib.Wii.Animations
             {
                 float start = 0.0f;
                 float end = 0.0f;
+                float frameAlign = 0.0f;
+                double angMode = Maths._deg2rad;
                 string line;
                 while (true)
                 {
@@ -134,12 +141,17 @@ namespace BrawlLib.Wii.Animations
                         case "endUnitless":
                             float.TryParse(val, out end);
                             break;
-
+                        case "angularUnit":
+                            string[] angLine = line.Split(' ');
+                            if (angLine[1].Contains("deg"))
+                                angMode = Maths._deg2rad;
+                            else if (angLine[1].Contains("rad"))
+                                angMode = 1.0d;
+                            break;
                         case "animVersion":
                         case "mayaVersion":
                         case "timeUnit":
                         case "linearUnit":
-                        case "angularUnit":
                         default:
                             break;
                     }
@@ -147,6 +159,11 @@ namespace BrawlLib.Wii.Animations
 
                 int frameCount = (int) (end - start + 1.5f);
                 node.FrameCount = frameCount;
+                if (start == 0.0f)
+                {
+                    end++;
+                } 
+
 
                 while (true)
                 {
@@ -252,14 +269,19 @@ namespace BrawlLib.Wii.Animations
                             if (tag == "keys")
                             {
                                 List<KeyframeEntry> l = new List<KeyframeEntry>();
+                                List<string> lines = new List<string>();
                                 while (true)
                                 {
-                                    line = file.ReadLine().TrimStart();
-
-                                    if (line == "}")
+                                    string newline = file.ReadLine().TrimStart();
+                                    if (newline == "}")
                                     {
                                         break;
                                     }
+                                    lines.Add(newline);
+                                }
+                                for (int k = 0; k < lines.Count; k++)
+                                {
+                                    line = lines[k];
 
                                     string[] s = line.Split(' ');
 
@@ -268,26 +290,33 @@ namespace BrawlLib.Wii.Animations
                                         s[si] = s[si].Trim('\n', ';', ' ');
                                     }
 
+
                                     float.TryParse(s[0], NumberStyles.Number, CultureInfo.InvariantCulture,
                                         out float inVal);
                                     float.TryParse(s[1], NumberStyles.Number, CultureInfo.InvariantCulture,
                                         out float outVal);
+                                    if (start == 0.0f)
+                                        inVal++;
 
+                                    if (angMode == 1.0d && (mode >= 3 && mode <= 5)) //only do so for rotation if accepting radians!
+                                    {
+                                        outVal = (float)(Maths._rad2deg * (double)outVal);
+                                    }
                                     float weight1 = 0;
                                     float weight2 = 0;
 
                                     float angle1 = 0;
                                     float angle2 = 0;
 
-                                    bool firstFixed = false;
-                                    bool secondFixed = false;
+                                    bool firstFixed = false, secondFixed = false;
+                                    bool isAuto = false, hasStep = false;
                                     switch (s[2])
                                     {
                                         case "linear":
-                                        case "spline":
                                         case "auto":
+                                            isAuto = true;
                                             break;
-
+                                        case "spline":
                                         case "fixed":
                                             firstFixed = true;
                                             float.TryParse(s[7], NumberStyles.Number, CultureInfo.InvariantCulture,
@@ -300,10 +329,9 @@ namespace BrawlLib.Wii.Animations
                                     switch (s[3])
                                     {
                                         case "linear":
-                                        case "spline":
                                         case "auto":
                                             break;
-
+                                        case "spline":
                                         case "fixed":
                                             secondFixed = true;
                                             if (firstFixed)
@@ -322,13 +350,27 @@ namespace BrawlLib.Wii.Animations
                                             }
 
                                             break;
+                                        case "step":
+                                            secondFixed = true;
+                                            hasStep = true;
+                                            angle2 = 0;
+                                            weight2 = 1;
+                                            break;
                                     }
 
                                     bool anyFixed = secondFixed || firstFixed;
                                     bool bothFixed = secondFixed && firstFixed;
-
+                                    
                                     KeyframeEntry x = e.SetKeyframe(mode, (int) (inVal - 0.5f), outVal, true);
-                                    if (!anyFixed)
+                                    if (isAuto && hasStep)
+                                    {
+                                        x._tangent = 0;
+                                        if (x._prev != null)
+                                            x._tangent = x._prev._tangent;
+                                        x.InsertAfter(new KeyframeEntry(x)
+                                            { _tangent = 0, _isStep = true });
+                                    }
+                                    else if (!anyFixed)
                                     {
                                         l.Add(x);
                                     }
@@ -336,16 +378,39 @@ namespace BrawlLib.Wii.Animations
                                     {
                                         if (bothFixed)
                                         {
-                                            x._tangent = (float) Math.Tan((angle1 + angle2) / 2 * Maths._deg2radf) *
-                                                         ((weight1 + weight2) / 2);
+                                            float outTangent = 0.0f;
+                                            if (mode >= 3 && mode <= 5)
+                                            {
+                                                x._tangent = (float)((double)angle1 * angMode);
+                                                outTangent = (float)((double)angle2 * angMode);
+                                            }
+                                            else
+                                            {
+                                                x._tangent = (float)((double)angle1 * Maths._deg2rad);
+                                                outTangent = (float)((double)angle2 * Maths._deg2rad);
+                                            }
+
+                                                
+                                            if (Math.Round(x._tangent,5) != Math.Round(outTangent,5))
+                                            {
+                                                x.InsertAfter(new KeyframeEntry(x)
+                                                { _tangent = outTangent });
+                                            }
+                                            //anticpate step
+                                            if (x._prev != null && 
+                                                x._prev._isStep)
+                                            {
+                                                x._prev.InsertAfter(new KeyframeEntry(x._index - 1, x._prev._value, x._parent)
+                                                {   _tangent = 0    });
+                                            }
                                         }
                                         else if (firstFixed)
                                         {
-                                            x._tangent = (float) Math.Tan(angle1 * Maths._deg2radf) * weight1;
+                                            x._tangent = (float)((double)angle1 * angMode) * weight1;
                                         }
                                         else
                                         {
-                                            x._tangent = (float) Math.Tan(angle2 * Maths._deg2radf) * weight2;
+                                            x._tangent = (float)((double)angle2 * angMode) * weight2;
                                         }
                                     }
                                 }
