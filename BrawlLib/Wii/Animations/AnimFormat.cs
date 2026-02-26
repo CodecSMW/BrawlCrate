@@ -50,8 +50,7 @@ namespace BrawlLib.Wii.Animations
                 file.WriteLine($"endTime {node.FrameCount - 1};");
                 foreach (MDL0BoneNode b in model.AllBones)
                 {
-                    CHR0EntryNode e = node.FindChild(b.Name, true) as CHR0EntryNode;
-                    if (e == null)
+                    if (!(node.FindChild(b.Name, true) is CHR0EntryNode e))
                     {
                         file.WriteLine($"anim {b.Name} 0 {b.Children.Count} 0;");
                         continue;
@@ -97,6 +96,11 @@ namespace BrawlLib.Wii.Animations
                         file.WriteLine("  }");
                         file.WriteLine("}");
                         counter++;
+                    }
+
+                    if (counter == 0)
+                    {
+                        file.WriteLine($"anim {b.Name} 0 {b.Children.Count} 0;");
                     }
                 }
             }
