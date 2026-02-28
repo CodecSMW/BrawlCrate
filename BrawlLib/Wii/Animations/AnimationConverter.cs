@@ -697,7 +697,7 @@ namespace BrawlLib.Wii.Animations
                         {
                             format = AnimDataFormat.I6;
                         }
-                        else if (@group == 1 && frameSpan <= 3.0f)
+                        else if (@group == 1 && frameSpan <= 1.4f)
                         {
                             format = AnimDataFormat.L4;
                         }
@@ -706,7 +706,7 @@ namespace BrawlLib.Wii.Animations
                             format = AnimDataFormat.I12;
                         }
                     }
-                    else if (@group == 1 && frameSpan <= 3.0f)
+                    else if (@group == 1 && frameSpan <= 1.4f)
                     {
                         format = AnimDataFormat.L4;
                     }
