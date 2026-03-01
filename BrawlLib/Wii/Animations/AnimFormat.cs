@@ -46,8 +46,8 @@ namespace BrawlLib.Wii.Animations
                 file.WriteLine("timeUnit ntscf;");
                 file.WriteLine("linearUnit cm;");
                 file.WriteLine("angularUnit deg;");
-                file.WriteLine("startTime 0;");
-                file.WriteLine($"endTime {node.FrameCount - 1};");
+                file.WriteLine("startTime 1;");
+                file.WriteLine($"endTime {node.FrameCount};");
                 foreach (MDL0BoneNode b in model.AllBones)
                 {
                     if (!(node.FindChild(b.Name, true) is CHR0EntryNode e))
@@ -79,8 +79,16 @@ namespace BrawlLib.Wii.Animations
                         for (KeyframeEntry entry = array._keyRoot._next; entry != array._keyRoot; entry = entry._next)
                         {
                             float angle = (float) Math.Atan(entry._tangent) * Maths._rad2degf;
+                            float angle2 = angle;
+                            if (entry._next != array._keyRoot && //Done to allow in/out key handle splits to store properly.
+                                entry._next._value == entry._value &&
+                                entry._next._index == entry._index)
+                            {
+                                entry = entry._next;
+                                angle2 = (float)Math.Atan(entry._tangent) * Maths._rad2degf;
+                            }
                             file.WriteLine("    {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10};",
-                                entry._index,
+                                entry._index+1,
                                 entry._value.ToString(CultureInfo.InvariantCulture.NumberFormat),
                                 "fixed",
                                 "fixed",
@@ -89,7 +97,7 @@ namespace BrawlLib.Wii.Animations
                                 "0",
                                 angle.ToString(CultureInfo.InvariantCulture.NumberFormat),
                                 "1",
-                                angle.ToString(CultureInfo.InvariantCulture.NumberFormat),
+                                angle2.ToString(CultureInfo.InvariantCulture.NumberFormat),
                                 "1");
                         }
 
