@@ -38,6 +38,7 @@ namespace BrawlLib.Wii.Animations
         }
 
         private int _frameLimit;
+        public string _boneName, _animName;
 
         public int FrameLimit
         {
@@ -55,10 +56,12 @@ namespace BrawlLib.Wii.Animations
         public KeyframeCollection(int arrayCount, int numFrames, params float[] defaultValues)
         {
             _frameLimit = numFrames;
+            _boneName = null; //for debugging purposes
+            _animName = null;
             _keyArrays = new KeyframeArray[arrayCount];
             for (int i = 0; i < arrayCount; i++)
             {
-                _keyArrays[i] = new KeyframeArray(numFrames, i < defaultValues.Length ? defaultValues[i] : 0);
+                _keyArrays[i] = new KeyframeArray(numFrames, i < defaultValues.Length ? defaultValues[i] : 0, this);
             }
         }
 
@@ -399,6 +402,7 @@ namespace BrawlLib.Wii.Animations
     public class KeyframeArray
     {
         internal KeyframeEntry _keyRoot;
+        internal KeyframeCollection _parent;
         internal int _keyCount;
 
         private bool _looped;
@@ -431,9 +435,10 @@ namespace BrawlLib.Wii.Animations
             set => SetFrameValue(index, value);
         }
 
-        public KeyframeArray(int limit, float defaultValue = 0)
+        public KeyframeArray(int limit, float defaultValue = 0, KeyframeCollection parent = null)
         {
             _frameLimit = limit;
+            _parent = parent;
             _keyRoot = new KeyframeEntry(-1, defaultValue, this);
         }
 
