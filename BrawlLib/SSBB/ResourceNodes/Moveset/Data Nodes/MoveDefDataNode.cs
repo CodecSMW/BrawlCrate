@@ -11,6 +11,7 @@ namespace BrawlLib.SSBB.ResourceNodes
     public unsafe class MoveDefDataNode : MoveDefEntryNode
     {
         internal MovesetHeader* Header => (MovesetHeader*) WorkingUncompressed.Address;
+        public override ResourceType ResourceFileType => ResourceType.MDefDataFt;
 
         public List<SpecialOffset> specialOffsets = new List<SpecialOffset>(); 
 
@@ -497,10 +498,11 @@ namespace BrawlLib.SSBB.ResourceNodes
                 //FighterSpecificParams();
 
                 //These offsets follow no patterns
-                int y = 0;
+                int y = -1;
                 MoveDefExternalNode ext = null;
                 foreach (int DataOffset in _extraOffsets)
                 {
+                    y++;
                     if (UniqueParameter(DataOffset,y)) //Moved to organize
                     {
                         continue;
@@ -650,9 +652,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                             _extraEntries.Add(y, entry);
                         }
-                    }
-
-                    y++;
+                    }       
                 }
 
                 misc.Populate();
@@ -746,7 +746,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             else if (index == 7 && RootNode.Name == "FitPit" || index == 13 && RootNode.Name == "FitRobot")
                 p = new Pit7Robot13Node();
             else if (index == 8 && RootNode.Name == "FitLucario")
-                p = new HitDataListOffsetNode { _name = "HitDataList " + index };
+                p = new HitDataListOffsetNode { _name = "HitDataList " + index }; //note this is distinct
             else if (index > 9 && RootNode.Name == "FitYoshi")
                 p = new Yoshi9();
             else if (index == 15 && RootNode.Name == "FitDedede")

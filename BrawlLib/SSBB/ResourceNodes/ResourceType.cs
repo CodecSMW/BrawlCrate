@@ -153,10 +153,12 @@
 
         //Moveset
         MDef,
+        MDefDataFt,
         NoEdit,
         NoEditFolder,
         NoEditEntry,
         NoEditItem,
+        MDefAnimParam,
         MDefAction,
         MDefActionGroup,
         MDefSubActionGroup,
@@ -167,6 +169,7 @@
         MDefSubroutineList,
         MDefActionOverrideList,
         MDefHurtboxList,
+        MDefMiscList,
         MDefRefList,
         Event,
         Parameter,

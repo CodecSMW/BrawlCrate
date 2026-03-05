@@ -1117,9 +1117,26 @@ namespace BrawlCrate.NodeWrappers
                 node.AddChild(new MoveDefActionNode("SFX", true, _resource));
                 node.AddChild(new MoveDefActionNode("Other", true, _resource));
             }
+            else if (_resource.Children[0] is MoveDefActionGroupNode && _resource.Parent.Name == "animParam")
+            {
+                bool hidden = Text.StartsWith("Hidden");
+                node = new MoveDefActionGroupNode { Name = "Action " + (_resource.Children.Count) };
+                node.AddChild(new MoveDefActionNode("Entry", true, _resource));
+                if (hidden)
+                {
+                    node.Name = "Hidden " + node.Name;
+                }
+                else
+                {
+                    (_resource.Parent as MoveDefAnimParamNode).actionFlags.AddChild(new MoveDefActionFlagsEntryNode
+                    {
+                        Name = "Action " + (_resource.Children.Count)
+                    });
+                }                 
+            }
             else if (_resource.Children[0] is MoveDefActionGroupNode)
             {
-                node = new MoveDefActionGroupNode {Name = "Action" + (_resource.Children.Count + 274)};
+                node = new MoveDefActionGroupNode { Name = "Action" + (_resource.Children.Count + 274) };
                 node.AddChild(new MoveDefActionNode("Entry", true, _resource));
                 node.AddChild(new MoveDefActionNode("Exit", true, _resource));
                 (_resource as MoveDefEntryNode).Root.data.actionFlags.AddChild(new MoveDefActionFlagsEntryNode
@@ -1177,6 +1194,218 @@ namespace BrawlCrate.NodeWrappers
         {
             ContextMenuStrip = _menu;
         }
+    }
+
+    [NodeWrapper(ResourceType.MDefDataFt)]
+    public class MDefFighterDataWrapper : GenericWrapper
+    {
+        #region Menu
+        private static ContextMenuStrip _menu;
+        static MDefFighterDataWrapper()
+        {
+            _menu = new ContextMenuStrip();
+            _menu.Items.Add(new ToolStripMenuItem("Add Entry Override List", null, OverrideEntryAction, Keys.Control | Keys.N));
+            _menu.Items.Add(new ToolStripMenuItem("Add Exit Override List", null, OverrideExitAction, Keys.Control | Keys.X));
+            _menu.Items.Add(new ToolStripSeparator());
+            _menu.Items.Add(new ToolStripMenuItem("&Export", null, ExportAction, Keys.Control | Keys.E));
+            _menu.Opening += MenuOpening;
+            _menu.Closing += MenuClosing;
+        }
+
+        private static void MenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+        }
+
+        private static void MenuOpening(object sender, CancelEventArgs e)
+        {
+            MDefFighterDataWrapper w = GetInstance<MDefFighterDataWrapper>();
+            MoveDefDataNode data = w._resource as MoveDefDataNode;
+
+            _menu.Items[0].Enabled = (data.override1 == null) ? true : false;
+            _menu.Items[1].Enabled = (data.override2 == null) ? true : false;
+        }
+        #endregion
+        public MDefFighterDataWrapper()
+        {
+            ContextMenuStrip = _menu;
+        }
+
+        protected static void OverrideEntryAction(object sender, EventArgs e)
+        {
+            GetInstance<MDefFighterDataWrapper>().OverrideAdd(0);
+        }
+        protected static void OverrideExitAction(object sender, EventArgs e)
+        {
+            GetInstance<MDefFighterDataWrapper>().OverrideAdd(1);
+        }
+
+        public void OverrideAdd(int mode)
+        {
+            MoveDefDataNode data = _resource as MoveDefDataNode;
+            MoveDefActionOverrideNode overrideNode = new MoveDefActionOverrideNode();
+            overrideNode.Name = "statusAnimCmd";
+            if (mode == 1)
+                overrideNode.Name += "Exit";
+            overrideNode.Name += "DisguiseList__ft" + Parent.Parent.Text.Substring(11) + "Node";
+            if (mode == 0)
+            {
+                data.override1 = overrideNode;
+            }
+            else
+            {
+                data.override2 = overrideNode;
+            }
+            data.AddChild(overrideNode);
+        }
+    }
+
+    [NodeWrapper(ResourceType.MDefMiscList)]
+    public class MDefMiscSectionWrapper : GenericWrapper
+    {
+        #region Menu
+        private static ContextMenuStrip _menu;
+        static MDefMiscSectionWrapper()
+        {
+            _menu = new ContextMenuStrip();
+            _menu.Items.Add(new ToolStripMenuItem("Add Crawl", null, CrawlAdd, Keys.Control | Keys.C));
+            _menu.Items.Add(new ToolStripMenuItem("Add Multi-Jump", null, MultiJumpAdd, Keys.Control | Keys.J));
+            _menu.Items.Add(new ToolStripMenuItem("Add Tether", null, TetherAdd, Keys.Control | Keys.T));
+            _menu.Items.Add(new ToolStripMenuItem("Add Glide", null, GlideAdd, Keys.Control | Keys.G));
+            _menu.Items.Add(new ToolStripSeparator());
+            _menu.Items.Add(new ToolStripMenuItem("&Export", null, ExportAction, Keys.Control | Keys.E));
+            _menu.Opening += MenuOpening;
+            _menu.Closing += MenuClosing;
+        }
+
+        private static void MenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+        }
+
+        private static void MenuOpening(object sender, CancelEventArgs e)
+        {
+            MDefMiscSectionWrapper w = GetInstance<MDefMiscSectionWrapper>();
+            MoveDefMiscNode misc = w._resource as MoveDefMiscNode;
+
+            _menu.Items[0].Enabled = (misc.crawl == null) ? true : false;
+            _menu.Items[1].Enabled = (misc.multiJump == null) ? true : false;
+            _menu.Items[2].Enabled = (misc.tether == null) ? true : false;
+            _menu.Items[3].Enabled = (misc.glide == null) ? true : false;
+        }
+
+
+        #endregion
+        public MDefMiscSectionWrapper()
+        {
+            ContextMenuStrip = _menu;
+        }
+        protected static void CrawlAdd(object sender, EventArgs e)
+        {
+            MDefMiscSectionWrapper w = GetInstance<MDefMiscSectionWrapper>();
+            MoveDefMiscNode misc = w.Resource as MoveDefMiscNode;
+            misc.crawl = new MoveDefCrawlNode();
+            misc.crawl.PrepareInit();
+            misc.AddChild(misc.crawl);
+        }
+        protected static void GlideAdd(object sender, EventArgs e)
+        {
+            MDefMiscSectionWrapper w = GetInstance<MDefMiscSectionWrapper>();
+            MoveDefMiscNode misc = w.Resource as MoveDefMiscNode;
+            misc.glide = new MoveDefGlideNode();
+            misc.glide.PrepareInit();
+            misc.AddChild(misc.glide);
+        }
+
+        protected static void MultiJumpAdd(object sender, EventArgs e)
+        {
+            MDefMiscSectionWrapper w = GetInstance<MDefMiscSectionWrapper>();
+            MoveDefMiscNode misc = w.Resource as MoveDefMiscNode;
+            misc.multiJump = new MoveDefMultiJumpNode();
+            misc.multiJump.PrepareInit(true);
+            misc.AddChild(misc.multiJump);
+        }
+        protected static void TetherAdd(object sender, EventArgs e)
+        {
+            MDefMiscSectionWrapper w = GetInstance<MDefMiscSectionWrapper>();
+            MoveDefMiscNode misc = w.Resource as MoveDefMiscNode;
+            misc.tether = new MoveDefTetherNode();
+            misc.tether.PrepareInit();
+            misc.AddChild(misc.tether);
+        }
+    }
+
+    [NodeWrapper(ResourceType.MDefAnimParam)]
+    public class MDefAnimParamWrapper : GenericWrapper
+    {
+        #region Menu
+
+        private static ContextMenuStrip _menu;
+        static MDefAnimParamWrapper()
+        {
+            _menu = new ContextMenuStrip();
+            _menu.Items.Add(new ToolStripMenuItem("Add Hurtbox Overrides", null, HurtboxListAdd, Keys.Control | Keys.H));
+            _menu.Items.Add(new ToolStripMenuItem("Add Reflectbox Overrides", null, ShieldboxListAdd, Keys.Control | Keys.R));
+            _menu.Items.Add(new ToolStripMenuItem("Add Item Param Section", null, ItmParamAddAction, Keys.Control | Keys.I));
+            _menu.Items.Add(new ToolStripSeparator());
+            _menu.Items.Add(new ToolStripMenuItem("&Export", null, ExportAction, Keys.Control | Keys.E));
+            _menu.Opening += MenuOpening;
+            _menu.Closing += MenuClosing;
+        }
+
+        private static void MenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+        }
+
+        private static void MenuOpening(object sender, CancelEventArgs e)
+        {
+            MDefAnimParamWrapper w = GetInstance<MDefAnimParamWrapper>();
+            MoveDefAnimParamNode param = w._resource as MoveDefAnimParamNode;
+            MoveDefSectionNode section = param.Parent as MoveDefSectionNode;
+
+            _menu.Items[0].Enabled = (param.hurtboxes == null) ? true : false;
+            _menu.Items[1].Enabled = (param.shieldboxes == null) ? true : false;
+            _menu.Items[2].Enabled = (section.Children.Count == 2) ? true : false;
+        }
+
+        #endregion
+
+        public MDefAnimParamWrapper()
+        {
+            ContextMenuStrip = _menu;
+        }
+        protected static void HurtboxListAdd(object sender, EventArgs e)
+        {
+            MDefAnimParamWrapper w = GetInstance<MDefAnimParamWrapper>();
+            MoveDefAnimParamNode param = w.Resource as MoveDefAnimParamNode;
+            param.hurtboxes = new MoveDefMiscHurtBoxesNode(0);
+            param.hurtboxes._name = "Override Hurtbox List";
+            param.hurtboxes.AddChild(new MoveDefHurtBoxNode { Enabled = true });
+            param.AddChild(param.hurtboxes);
+
+
+        }
+        protected static void ShieldboxListAdd(object sender, EventArgs e)
+        {
+            MDefAnimParamWrapper w = GetInstance<MDefAnimParamWrapper>();
+            MoveDefAnimParamNode param = w.Resource as MoveDefAnimParamNode;
+            param.shieldboxes = new MoveDefMiscHurtBoxesNode(0);
+            param.shieldboxes._name = "Override Reflectbox List";
+            param.shieldboxes.AddChild(new MoveDefHurtBoxNode { Enabled = true });
+            param.AddChild(param.shieldboxes);
+        }
+
+        protected static void ItmParamAddAction(object sender, EventArgs e)
+        {
+            GetInstance<MDefAnimParamWrapper>().ItmParamAdd();
+        }
+        public void ItmParamAdd()
+        {
+            MoveDefSectionNode section = Resource.Parent as MoveDefSectionNode;
+            ItmParamEntryNode itemInfo = new ItmParamEntryNode();
+            itemInfo.Name = "itemParam";
+            section.AddChild(itemInfo);
+        }
+        
+
     }
 
     [NodeWrapper(ResourceType.MDefActionGroup)]
@@ -1335,6 +1564,19 @@ namespace BrawlCrate.NodeWrappers
                     p.Name = "Action" + p.Index;
                 }
             }
+            else if ((n = _resource.Parent.Parent) is MoveDefAnimParamNode)
+            {
+                bool hidden = _resource.Parent.Name.StartsWith("Hidden");
+                if (!hidden)
+                {
+                    MoveDefActionFlagsNode flags = (n as MoveDefAnimParamNode).actionFlags;
+                    flags.Children[_resource.Index].Remove();
+                    foreach (MoveDefActionFlagsEntryNode p in flags.Children)
+                    {
+                        p.Name = "Action " + (p.Index);
+                    }
+                }
+            }
             else
             {
                 MoveDefNode node = (_resource as MoveDefEntryNode).Root;
@@ -1363,12 +1605,16 @@ namespace BrawlCrate.NodeWrappers
             int sub = 0;
             foreach (MoveDefActionGroupNode p in _resource.Parent.Children)
             {
+                bool hidden = Parent.Text.StartsWith("Hidden");
                 if (p.Index == _resource.Index)
                 {
                     sub = 1;
                 }
+                if (hidden)
+                   p.Name = "Hidden Action " + (p.Index - sub);
+                else
+                   p.Name = "Action " + (p.Index - sub);
 
-                p.Name = "Action" + (p.Index - sub);
             }
 
             Delete();

@@ -12,6 +12,7 @@ namespace BrawlLib.SSBB.ResourceNodes
     {
         internal AnimParamHeader* Header => (AnimParamHeader*) WorkingUncompressed.Address;
 
+        public override ResourceType ResourceFileType => ResourceType.MDefAnimParam;
         public List<SpecialOffset> specialOffsets = new List<SpecialOffset>();
         internal uint DataLen;
         private int unk14, unk14b;

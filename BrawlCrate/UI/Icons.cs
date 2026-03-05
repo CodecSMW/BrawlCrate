@@ -118,9 +118,11 @@ namespace BrawlCrate.UI
 
             //Moveset
             {ResourceType.MDef, Resources.MDef},
+            {ResourceType.MDefDataFt, Resources.Folder},
             {ResourceType.NoEditFolder, Resources.Folder},
             {ResourceType.NoEditEntry, Resources.Folder},
             {ResourceType.NoEditItem, Resources.Unknown},
+            {ResourceType.MDefAnimParam, Resources.Folder},
             {ResourceType.MDefAction, Resources.MDefAction},
             {ResourceType.MDefActionGroup, Resources.Folder},
             {ResourceType.MDefSubActionGroup, Resources.Folder},
@@ -131,6 +133,7 @@ namespace BrawlCrate.UI
             {ResourceType.MDefSubroutineList, Resources.Folder},
             {ResourceType.MDefActionOverrideList, Resources.Folder},
             {ResourceType.MDefHurtboxList, Resources.Folder},
+            {ResourceType.MDefMiscList, Resources.Folder},
             {ResourceType.MDefRefList, Resources.Folder},
             {ResourceType.Event, Resources.Event},
 

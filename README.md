@@ -4,7 +4,7 @@ This fork is focused around handling underdocumented formats.
 
 Current target: MDef
 
-Warning: Most MDef files will not properly save. Do not rely on this fork directly unless you are assesesing progress! When ready, features will be provided to the main BrawlCrate repository.
+Warning: Most MDef files will not properly save yet. Do not rely on this fork directly unless you are assesesing progress! When ready, features will be provided to the main BrawlCrate repository.
 
 Current status:
 
@@ -17,6 +17,8 @@ Features PSAC does not have:
   Fighter.pac support
   
   Ability to sort commands by type.
+  
+  Ability to add crawling, multi-jumps and more to fighters.
   
   Better requirement organization.
   
@@ -31,11 +33,11 @@ Fighter.Pac:
 
 Fighter Pac Files:
 
-  Most Readable
+  Most Readable.
   
   Only several compiling. Extra parameters and articles need case-by-case solutions. R.O.B. functional.
   
-  Feature Todo: Add ability to add/remove misc properties (i.e. multi-jumps) and action overrides. Assess custom parameter/article potential.
+  Ability to crawl, glide, tether (with the right module) and have multiple air jumps supported.
 
 Item Pac Files:
 
@@ -43,7 +45,10 @@ Item Pac Files:
   
   Not Compiling yet.
   
-  Feature Todo: Add ability to add/remove custom hurtboxes and reflectors. Add item parameter override format for ItemEX to use.
+  Ability to add custom hurtboxes and reflect/shield/absorbers to items present.
+  
+  Ability to add an item parameter with information on item behavior present.
+  
   
 Enemy Pac Files:
 

@@ -13,6 +13,7 @@ namespace BrawlLib.SSBB.ResourceNodes
     {
         internal FDefMiscSection* Header => (FDefMiscSection*) WorkingUncompressed.Address;
 
+        public override ResourceType ResourceFileType => ResourceType.MDefMiscList;
         private FDefMiscSection misc;
 
         [Category("Misc Offsets")] public int UnknownSection1Offset => misc.UnknownSection1Offset;
@@ -2182,14 +2183,30 @@ namespace BrawlLib.SSBB.ResourceNodes
                 SignalPropertyChange();
             }
         }
-
-        public override bool OnInitialize()
+        public void PrepareInit(bool menuRequest = false)
         {
-            base.OnInitialize();
             _name = "Misc MultiJump";
 
             unks = new List<float>();
             hops = new List<float>();
+
+            if (menuRequest)
+            {
+                for (int i = 0; i < 5; i++)
+                    hops.Add(2.0f);
+                for (int i = 1; i <= 12; i++)
+                    unks.Add(i * 15);
+                Unk1 = 0.3f;
+                Unk2 = 0.5f;
+                Unk3 = 0.8f;
+                HorizontalBoost = 0.8f;
+                TurnFrames = 12;
+            }
+        }
+        public override bool OnInitialize()
+        {
+            base.OnInitialize();
+            PrepareInit();
 
             unk1 = Header->_unk1;
             unk2 = Header->_unk2;
@@ -2370,13 +2387,17 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
         //[Category("Glide Attribute")]
         //public int Unknown2 { get { return intEntry2; } set { intEntry2 = value; SignalPropertyChange(); } }
-
+        
+        public void PrepareInit()
+        {
+            _name = "Misc Glide";
+            floatEntries = new float[20];
+            intEntry1 = 0;
+        }
         public override bool OnInitialize()
         {
             base.OnInitialize();
-            _name = "Misc Glide";
-
-            floatEntries = new float[20];
+            PrepareInit();
             for (int i = 0; i < floatEntries.Length; i++)
             {
                 floatEntries[i] = floatval[i];
@@ -2443,9 +2464,15 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
-        public override bool OnInitialize()
+        public void PrepareInit()
         {
             _name = "Misc Crawl";
+            forward = 1.4f;
+            backward = 1.4f;
+        }
+        public override bool OnInitialize()
+        {
+            PrepareInit();
             forward = Header->_forward;
             backward = Header->_backward;
             return false;
@@ -2496,10 +2523,15 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
+        public void PrepareInit()
+        {
+            _name = "Misc Tether";
+            numHangFrame = 90;
+            unk1 = 1;
+        }
         public override bool OnInitialize()
         {
             base.OnInitialize();
-            _name = "Misc Tether";
             numHangFrame = Header->_numHangFrame;
             unk1 = Header->_unk1;
             return false;
