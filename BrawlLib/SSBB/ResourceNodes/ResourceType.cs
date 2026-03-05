@@ -227,6 +227,7 @@
         ItemFreqTableNode,
         ItemFreqTableGroupNode,
         ItemFreqEntryNode,
+        ItemInfo,
 
         // Project +
         ASLS,

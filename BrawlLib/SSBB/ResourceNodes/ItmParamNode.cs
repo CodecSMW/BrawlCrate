@@ -530,7 +530,7 @@ namespace BrawlLib.SSBB.ResourceNodes
     public unsafe class ItmParamEntryNode : ResourceNode
     {
         internal ItmParamEntry Data;
-        public override ResourceType ResourceFileType => ResourceType.NoEditItem;
+        public override ResourceType ResourceFileType => ResourceType.ItemInfo;
 
         [Category("Item Parameters")]
         public float HurtboxSize
