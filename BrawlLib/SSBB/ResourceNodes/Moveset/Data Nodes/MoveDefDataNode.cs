@@ -169,7 +169,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         public MoveDefArticleNode entryArticle;
         public MoveDefStaticArticleGroupNode staticArticles;
         public MoveDefActionInterruptsNode actionInterrupts;
-        public MoveDefCharItemNode unk24;
+        public MoveDefCharItemNode charItems;
         public MoveDefBoneIndicesNode boneRef1;
         public MoveDefBoneRef2Node boneRef2;
 
@@ -430,7 +430,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                 if (specialOffsets[24].Size != 0)
                 {
-                    (unk24 = new MoveDefCharItemNode {offsetID = 24}).Initialize(this,
+                    (charItems = new MoveDefCharItemNode {offsetID = 24}).Initialize(this,
                         BaseAddress + specialOffsets[24].Offset, 8);
                 }
 

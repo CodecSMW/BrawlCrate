@@ -1206,6 +1206,7 @@ namespace BrawlCrate.NodeWrappers
             _menu = new ContextMenuStrip();
             _menu.Items.Add(new ToolStripMenuItem("Add Entry Override List", null, OverrideEntryAction, Keys.Control | Keys.N));
             _menu.Items.Add(new ToolStripMenuItem("Add Exit Override List", null, OverrideExitAction, Keys.Control | Keys.X));
+            _menu.Items.Add(new ToolStripMenuItem("Add Character Item Node", null, CharacterItemAdd, Keys.Control | Keys.I));
             _menu.Items.Add(new ToolStripSeparator());
             _menu.Items.Add(new ToolStripMenuItem("&Export", null, ExportAction, Keys.Control | Keys.E));
             _menu.Opening += MenuOpening;
@@ -1223,6 +1224,7 @@ namespace BrawlCrate.NodeWrappers
 
             _menu.Items[0].Enabled = (data.override1 == null) ? true : false;
             _menu.Items[1].Enabled = (data.override2 == null) ? true : false;
+            _menu.Items[2].Enabled = (data.charItems == null) ? true : false;
         }
         #endregion
         public MDefFighterDataWrapper()
@@ -1256,6 +1258,54 @@ namespace BrawlCrate.NodeWrappers
                 data.override2 = overrideNode;
             }
             data.AddChild(overrideNode);
+        }
+
+        protected static void CharacterItemAdd(object sender, EventArgs e)
+        {
+            MDefFighterDataWrapper w = GetInstance<MDefFighterDataWrapper>();
+            MoveDefDataNode data = w.Resource as MoveDefDataNode;
+            data.charItems = new MoveDefCharItemNode();
+            data.charItems.PrepareInit();
+            data.AddChild(data.charItems);
+        }
+    }
+    [NodeWrapper(ResourceType.MDefCharItemList)]
+    public class MDefCharItemListWrapper : GenericWrapper
+    {
+        #region Menu
+        private static ContextMenuStrip _menu;
+        static MDefCharItemListWrapper()
+        {
+            _menu = new ContextMenuStrip();
+            _menu.Items.Add(new ToolStripMenuItem("Add Item", null, ItemAdd, Keys.Control | Keys.I));
+            _menu.Items.Add(new ToolStripSeparator());
+            _menu.Items.Add(new ToolStripMenuItem("&Export", null, ExportAction, Keys.Control | Keys.E));
+            _menu.Opening += MenuOpening;
+            _menu.Closing += MenuClosing;
+        }
+
+        private static void MenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+        }
+
+        private static void MenuOpening(object sender, CancelEventArgs e)
+        {
+
+        }
+        public MDefCharItemListWrapper()
+        {
+            ContextMenuStrip = _menu;
+        }
+
+        #endregion
+
+        protected static void ItemAdd(object sender, EventArgs e)
+        {
+            MDefCharItemListWrapper w = GetInstance<MDefCharItemListWrapper>();
+            MoveDefCharItemNode itemList = w.Resource as MoveDefCharItemNode;
+            MoveDefIndexNode item = new MoveDefIndexNode();
+            item.Name = "Index" + itemList.Children.Count;
+            itemList.AddChild(item);
         }
     }
 

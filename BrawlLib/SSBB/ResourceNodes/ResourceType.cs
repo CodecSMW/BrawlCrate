@@ -170,6 +170,7 @@
         MDefActionOverrideList,
         MDefHurtboxList,
         MDefMiscList,
+        MDefCharItemList,
         MDefRefList,
         Event,
         Parameter,

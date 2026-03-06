@@ -317,7 +317,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             part5Len += GetSize(node.misc.collisionData, ref lookupCount);
 
-            part5Len += GetSize(node.unk24, ref lookupCount);
+            part5Len += GetSize(node.charItems, ref lookupCount);
 
             part5Len += GetSize(node.misc.unk12, ref lookupCount);
 
@@ -904,7 +904,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             miscOffsetsAddr->CollisionDataOffset =
                 Rebuild(RootNode, node.misc.collisionData, ref dataAddress, baseAddress);
 
-            header->Unknown24 = Rebuild(RootNode, node.unk24, ref dataAddress, baseAddress);
+            header->Unknown24 = Rebuild(RootNode, node.charItems, ref dataAddress, baseAddress);
 
             miscOffsetsAddr->UnknownSection12Offset = Rebuild(RootNode, node.misc.unk12, ref dataAddress, baseAddress);
 

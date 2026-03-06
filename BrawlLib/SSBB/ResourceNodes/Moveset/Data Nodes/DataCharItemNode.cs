@@ -7,19 +7,27 @@ namespace BrawlLib.SSBB.ResourceNodes
     {
         internal FDefListOffset* Header => (FDefListOffset*) WorkingUncompressed.Address;
         internal int i = 0;
+        public override ResourceType ResourceFileType => ResourceType.MDefCharItemList;
 
-        public int DataOffset => Header->_startOffset;
-        public int Count => Header->_listCount;
+        public int DataOffset;
+        public int Count;
 
         public override bool OnInitialize()
         {
             base.OnInitialize();
+            PrepareInit();
+            Count = Header->_listCount;
+            DataOffset = Header->_startOffset;
+            return Count > 0;
+        }
+
+        public void PrepareInit()
+        {
             if (_name == null)
             {
                 _name = "Character Item Bres IDs";
+                Count = 0;
             }
-
-            return Count > 0;
         }
 
         public override void OnPopulate()

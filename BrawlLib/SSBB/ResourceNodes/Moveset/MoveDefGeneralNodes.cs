@@ -330,12 +330,25 @@ namespace BrawlLib.SSBB.ResourceNodes
         internal int i;
 
         [Category("Index Entry")]
-        public int ItemIndex
+
+        public short ExtraIndex
         {
-            get => i;
+            get => (short)(((uint)i & 0xFFFF0000) / 0x10000);
             set
             {
-                i = value;
+                i &= 0xFFFF;
+                i += value * 0x10000;
+            }
+
+        }
+
+        [Category("Index Entry")]
+        public short ItemIndex
+        {
+            get => (short)(i & 0xFFFF);
+            set
+            {
+                i = (int)(value + (i & 0xFFFF0000));
                 SignalPropertyChange();
             }
         }
