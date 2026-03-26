@@ -968,7 +968,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
-        public int effect, unk1, sound, unk2, ground, air, unk3, type, clang, unk4, direct, unk5;
+        public int effect, unk1, sound, soundVol, unk2, ground, air, unk3, type, clang, unk4, direct, unk5;
 
         [Category("MoveDef Hitbox Flags")]
         public HitboxEffect Effect
@@ -999,6 +999,16 @@ namespace BrawlLib.SSBB.ResourceNodes
             set
             {
                 sound = (int) value;
+                CalcFlags();
+            }
+        }
+        [Category("MoveDef Hitbox Flags")]
+        public HitboxSFXLevel SoundVol
+        {
+            get => (HitboxSFXLevel)val.SoundVol;
+            set
+            {
+                soundVol = (int)value;
                 CalcFlags();
             }
         }
@@ -1124,7 +1134,8 @@ namespace BrawlLib.SSBB.ResourceNodes
         {
             val.data = (effect << 0) |
                        (unk1 << 5) |
-                       (sound << 6) |
+                       (soundVol << 6) |
+                       (sound << 9) |
                        (unk2 << 14) |
                        (ground << 16) |
                        (air << 17) |
@@ -1146,6 +1157,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         {
             effect = val.Effect;
             unk1 = val.Unk1;
+            soundVol = val.SoundVol;
             sound = val.Sound;
             unk2 = val.Unk2;
             ground = val.Grounded;
@@ -1175,18 +1187,19 @@ namespace BrawlLib.SSBB.ResourceNodes
         //0010 0000 0000 0000 0000 0000 0000 0000   Direct
         //1100 0000 0000 0000 0000 0000 0000 0000   Unknown5
 
-        public int Effect => data & 0x1F;
+        public int Effect => data & 0b11111;
         public int Unk1 => (data >> 5) & 1;
-        public int Sound => (data >> 6) & 0xFF;
-        public int Unk2 => (data >> 14) & 3;
+        public int SoundVol => (data >> 6) & 0b11;
+        public int Sound => (data >> 9) & 0b11111;
+        public int Unk2 => (data >> 14) & 0b11;
         public int Grounded => (data >> 16) & 1;
         public int Aerial => (data >> 17) & 1;
-        public int Unk3 => (data >> 18) & 0xF;
-        public int Type => (data >> 22) & 0x1F;
+        public int Unk3 => (data >> 18) & 0b1111;
+        public int Type => (data >> 22) & 0b11111;
         public int Clang => (data >> 27) & 1;
         public int Unk4 => (data >> 28) & 1;
         public int Direct => (data >> 29) & 1;
-        public int Unk5 => (data >> 30) & 3;
+        public int Unk5 => (data >> 30) & 0b11;
 
         public int data;
     }
