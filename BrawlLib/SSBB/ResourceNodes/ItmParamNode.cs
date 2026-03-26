@@ -1637,5 +1637,31 @@ namespace BrawlLib.SSBB.ResourceNodes
         {
             *(ItmParamEntry*)address = Data;
         }
+
+        /// <summary>
+        /// A simple method to make sure you are able to see a custom item in-game.
+        /// </summary>
+        public void TemplateSettings()
+        {
+            Data._throwSpeedX = 1f;
+            Data._throwSpeedY = 1f;
+            Data._throwSpeedZ = 0f;
+            Gravity = 0.1f;
+            TerminalVelocity = 2.2f;
+            SlideAngle = 1f;
+            SlideGravity = 0.5f;
+            AirFriction = 0.0025f;
+            GroundFriction = 0.03f;
+            BaseDamageMultiplier = -0.4f;
+            SpeedDamageMultiplier = 3f;
+            ItemScale = 1f;
+            ItemHealth = 50f;
+            BounceAgainstCeilings = true;
+            BounceAgainstFloors = true;
+            BounceAgainstWalls = true;
+            BounceAgainstHurtboxes = true;
+            ItemBlastzoneDespawn = ItemBlastzoneDespawnOptions.SidesAndBottomBlastzone;
+
+        }
     }
 }

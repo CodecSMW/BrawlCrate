@@ -8,7 +8,7 @@ using System.Runtime.Remoting.Channels;
 namespace BrawlLib.SSBB.ResourceNodes
 {
 
-public class MoveDefSubActionGroupNode : MoveDefEntryNode
+public class MoveDefSubActionGroupNode : MoveDefActionGroupNode
 {
  public override ResourceType ResourceFileType => ResourceType.MDefSubActionGroup;
  public override bool AllowDuplicateNames => true;

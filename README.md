@@ -43,12 +43,11 @@ Item Pac Files:
 
   100% Readable
   
-  Not Compiling yet.
+  100% Compiling (Still needs testing to verify new features)
   
   Ability to add custom hurtboxes and reflect/shield/absorbers to items present.
   
   Ability to add an item parameter with information on item behavior present.
-  
   
 Enemy Pac Files:
 

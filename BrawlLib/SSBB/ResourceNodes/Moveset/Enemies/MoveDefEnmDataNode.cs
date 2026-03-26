@@ -1,4 +1,5 @@
 ﻿using BrawlLib.Internal;
+using BrawlLib.SSBB.ResourceNodes.Moveset.Enemies;
 using BrawlLib.SSBB.Types;
 using System;
 using System.Collections.Generic;
@@ -113,10 +114,11 @@ namespace BrawlLib.SSBB.ResourceNodes
         public MoveDefSectionParamNode attributes1, attributes2; //6 7
         public MoveDefMiscHurtBoxesNode hurtboxes, shieldboxes;
         public List<MoveDefRawDataNode> triggerList;
-        public List<MoveDefSectionParamNode> rangeList;
         public CollDataType0 collisionData;
         public MoveDefBoneIndicesNode grColData;
         public MoveDefActionNode enmHiddenAction;
+
+        public MoveDefEnmTriggerNode enmTrigger;
         public MoveDefEnmDataNode(uint dataLen, string name)
         {
             DataLen = dataLen;
@@ -155,7 +157,6 @@ namespace BrawlLib.SSBB.ResourceNodes
             List<int> ActionOffsets;
             int count, subCount;
             triggerList = new List<MoveDefRawDataNode>();
-            rangeList = new List<MoveDefSectionParamNode>();
 
             MoveDefActionListNode subActions =
                     new MoveDefActionListNode { _name = "SubAction Scripts", _parent = this },
@@ -304,13 +305,13 @@ namespace BrawlLib.SSBB.ResourceNodes
                 grColData.Initialize(this, BaseAddress + addr[0], addr[1] * 8); // bone indexes?
             }
 
-            if (specialOffsets[22].Offset != 0) //TODO: Trigget sets that have action overrides. ActionInit?
+            if (specialOffsets[22].Offset != 0) //TODO: Trigger sets that have action overrides. ActionInit?
             {
                 bint* addr = (bint*)(BaseAddress + specialOffsets[22].Offset);
                 MoveDefRawDataNode tempData;
                 for (int i = 0; i < (specialOffsets[8].Offset - specialOffsets[22].Offset) / 4; i++)
                 {
-                    tempData = new MoveDefRawDataNode("Action " + i); //TODO: Always internal "custom" actions + external actions
+                    tempData = new MoveDefRawDataNode("Trigger Action " + i); //TODO: Always internal "custom" actions + external actions
                     int tempOff = addr[i];
                     if (addr[i] >= 0x200000)
                     {
@@ -322,101 +323,10 @@ namespace BrawlLib.SSBB.ResourceNodes
                     triggerList.Add(tempData);
                 }
             }
-            if (specialOffsets[8].Offset != 0) //TODO: Trigget sets that have action overrides. ActionInit?
+            if (specialOffsets[8].Offset != 0) //TODO: Trigger sets that have action overrides. ActionInit?
             {
-                bint* addr = (bint*)(BaseAddress + specialOffsets[8].Offset);
-                MoveDefSectionParamNode tempData;
-                for (int i = 0; i < 60; i++)
-                {
-                    bint* offsetInfo = addr + 0x10 * i; //0x10 words = 0x40 bytes
-                    if (offsetInfo[0] != 0xB)
-                    {
-                        tempData = new MoveDefSectionParamNode { _name = "Range " + i };
-                        tempData.Initialize(this, offsetInfo, 0x40);
-                        rangeList.Add(tempData);
-                    }
-                    else
-                    {
-                        tempData = new MoveDefSectionParamNode { _name = "Range " + i + " - Camera" };
-                        tempData.Initialize(this, offsetInfo, 0x24);
-                        rangeList.Add(tempData);
-
-                        offsetInfo += 0x24 / 4;
-                        i++;
-                        
-                        tempData = new MoveDefSectionParamNode { _name = "Range " + i + " - TargetSearchUnit" };
-                        tempData.Initialize(this, offsetInfo, 0x20);
-                        rangeList.Add(tempData);
-
-                        offsetInfo += 0x20 / 4;
-
-                        int paramCount = 0;
-                        switch(RootNode.Name)
-                        {
-                            case "EnmFalconflyer":
-                                paramCount = 1; goto case "setup";
-                            //EnmFalconflyer: 1 int
-                            case "EnmBossPackun":
-                                paramCount = 4; goto case "setup";
-                            //EnmBossPackun: 1 float, 3 ints
-                            case "EnmRayquaza":
-                            case "EnmDuon":
-                            case "EnmGalleom":
-                                paramCount = 6; goto case "setup";
-                            //EnmRayquaza: 5 floats, 1 int
-                            //EnmDuon: 3 floats, 3 ints
-                            //EnmGalleom: 4 floats, 2 ints
-                            case "EnmRidley":
-                                paramCount = 7; goto case "setup";
-                            //EnmRidley: 2 floats, 5 ints
-                            case "EnmMetaridley":
-                            case "EnmTaboo":
-                                paramCount = 11; goto case "setup";
-                            //EnmMetaRidley: 7 floats, 4 ints 
-                            //EnmTaboo: 9 floats, 2 ints
-                            case "EnmMasterhand":
-                                paramCount = 21; goto case "setup";
-                            //EnmMasterhand: 14 floats, 7 ints 
-                            case "EnmCrazyhand":
-                                paramCount = 14; goto case "setup";
-                            //EnmCrazyhand: 12 floats, 2 ints 
-                            case "EnmPorky":
-                                paramCount = 9; goto case "setup";
-                            //EnmPorky: 5 floats, 4 ints
-                            case "setup":
-                                tempData = new MoveDefSectionParamNode { _name = "Param" };
-                                tempData.Initialize(this, offsetInfo, paramCount*4);
-                                rangeList.Add(tempData);
-                                break;
-                            default:
-                                break;
-                        }
-
-                        offsetInfo += paramCount;
-
-                        //TODO: More
-                        tempData = new MoveDefSectionParamNode { _name = "Randomization Table" }; //0x10 blocks
-                        tempData.Initialize(this, offsetInfo, 0x10 * 4); //4 possibilities to use as ranges
-                        rangeList.Add(tempData);
-                        break;
-
-                        //TODO: sweaponanmcmddata set following format
-                        /*
-                         0x8 bytes - pointer, sub count (int) Maybe always 3?
-                       
-                         0x8 * subCount bytes -
-                            - subacton
-                            - 4
-                            - subaction
-                            - 4
-                            - subaction
-                            - 4
-
-                            then followed by Data Table for boss (seen in Brawl Item Editor)
-                            then relocation offsets
-                        */
-                    }
-                }
+                enmTrigger = new MoveDefEnmTriggerNode { _name = "Trigger Section" };
+                enmTrigger.Initialize(this, BaseAddress + specialOffsets[8].Offset, 0);
             }
 
             #endregion
@@ -495,7 +405,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             //SortChildren();
         }
-
+        
         public void PopulateActionGroup(ResourceNode g, List<int> ActionOffsets, bool subactions, int index)
         {
             string innerName = "";
@@ -550,3 +460,4 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
     }
 }
+

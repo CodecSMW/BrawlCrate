@@ -141,10 +141,10 @@ namespace BrawlLib.SSBB.Types
     {
         public const int Size = 0x5C; //Not 68?
 
-        public bint Unknown0; //GlobalICBasics      //47 entries (size: 0xBC)
-        public bint Unknown1; //GlobalICBasicsSSE   //47 entries (size: 0xBC)
-        public bint Unknown2; //ICBasics            //227 entries (size: 0x89C) Is this really one less??? This is right.
-        public bint Unknown3; //ICBasicsSSE         //228 entries (size: 0x8A0)
+        public bint IC_Basics_Global; //GlobalICBasics      //47 entries (size: 0xBC)
+        public bint IC_Basics_Global_SSE; //GlobalICBasicsSSE   //47 entries (size: 0xBC)
+        public bint IC_Basics; //ICBasics            //227 entries (size: 0x89C) Is this really one less??? This is right.
+        public bint IC_Basics_SSE; //ICBasicsSSE         //228 entries (size: 0x8A0)
 
         public bint ActionsStart;  //Enter Actions
         public bint Actions2Start; //Exit Actions
@@ -190,10 +190,12 @@ namespace BrawlLib.SSBB.Types
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct AnimParamHeader
     {
-        public bint Unknown0;
-        public bint Unknown1;
-        public bint Unknown2;
-        public bint Unknown3;
+        public const int Size = 0x40;
+
+        public bint SubactionFlagsStart;
+        public bint SubactionCount;
+        public bint ActionFlagsStart;
+        public bint ActionCount;
         public bint Unknown4;
         public bint Unknown5;
         public bint Unknown6;

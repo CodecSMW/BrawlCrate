@@ -423,15 +423,11 @@ namespace BrawlCrate.NodeWrappers
             // Set the name programatically (based on Windows' implementation)
             int index = _resource.Index;
             int n = 0;
-            if (changeName)
+            if (changeName && _resource.Parent.FindChildrenByName(rNode2.Name).Length > 0)
             {
-                while (_resource.Parent.FindChildrenByName(rNode2.Name).Length >= 1)
-                {
-                    // Get the last index of the last duplicated node in order to place it after that one
-                    index = Math.Max(index, _resource.Parent.FindChildrenByName(rNode2.Name).Last().Index);
-                    // Set the name based on the number of duplicate nodes found
-                    rNode2.Name = $"{_resource.Name} ({++n})";
-                }
+                index = Math.Max(index, _resource.Parent.FindChildrenByName(rNode2.Name).Last().Index);
+                // Set the name based on the number of duplicate nodes found
+                rNode2.Name = _resource.Name + '(' + index + ')';//$"{_resource.Name} ({++n})";
             }
 
             // Place the node in the same containing parent, after the last duplicated node.

@@ -45,7 +45,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
-        [Browsable(false)] public MDL0Node Model => Root.Model;
+        [Browsable(false)] public MDL0Node Model => Root?.Model;
 
         [Browsable(false)]
         public MoveDefNode Root
@@ -1024,7 +1024,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         public MoveDefDataCommonNode dataCommon;
         public MoveDefAnimParamNode animParam;
         public MoveDefSubParamNode subParam;
-        public ItmParamEntryNode itemParam;
+        public MoveDefItemParamNode itemParam;
         public MoveDefEnmDataNode dataEnm;
         public MoveDefEnmWpnNode enmWeapon;
 
@@ -1285,7 +1285,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             //if (!RootNode._origPath.Contains("Test"))
             {
                 sections.Populate();
-                foreach (MoveDefEntryNode p in sections._sectionList)
+                foreach (ResourceNode p in sections._sectionList)
                 {
                     if (!(p.Name == "data" || p.Name == "dataCommon" ||
                         p.Name == "animParam" || p.Name == "subParam" || p.Name == "itemParam"))
@@ -1531,7 +1531,9 @@ namespace BrawlLib.SSBB.ResourceNodes
                 foreach (MoveDefEntryNode e in sections._sectionList)
                 {
                     e._lookupOffsets.Clear();
-                    if (e.Name == "data" || e.Name == "dataCommon")
+                    if (e.Name == "data" ||
+                        e.Name == "dataCommon" ||
+                        e.Name == "animParam")
                     {
                         dataHeaderAddr = sectionsAddr; //Don't rebuild yet
                         sectionsAddr += e._entryLength;
@@ -1579,7 +1581,10 @@ namespace BrawlLib.SSBB.ResourceNodes
                         }
 
                         //TODO: Make sure this writes properly for animCmd Action Nodes!
-                        if (!(e is MoveDefActionNode) && (e._lookupCount != e._lookupOffsets.Count &&
+                        //TODO: Probably not good design.
+                        if (e != null &&
+                            e is MoveDefExternalNode &&
+                            !(e is MoveDefActionNode) && (e._lookupCount != e._lookupOffsets.Count &&
                             !((e as MoveDefExternalNode)._refs[0] is MoveDefActionNode)))
                         {
                             Console.WriteLine();
@@ -1599,6 +1604,11 @@ namespace BrawlLib.SSBB.ResourceNodes
             {
                 dataCommon.dataHeaderAddr = dataHeaderAddr;
                 dataCommon.Rebuild(address + 0x20, dataCommon._childLength, true);
+            }
+            else if (animParam != null)
+            {
+                animParam.dataHeaderAddr = dataHeaderAddr;
+                animParam.Rebuild(address + 0x20, animParam._childLength, true);
             }
 
             if (references != null) // will be null for dataCommon
@@ -1972,9 +1982,8 @@ namespace BrawlLib.SSBB.ResourceNodes
                 }
                 else if (data.Key.Name == "itemParam")
                 {
-                    Root.itemParam = new ItmParamEntryNode();
-                    Root.itemParam._name = data.Key.Name;
-                    Root.itemParam.Initialize(this, new DataSource(BaseAddress + data.Value._dataOffset, ItmParamEntry.Size));
+                    (Root.itemParam = new MoveDefItemParamNode((uint)DataSize, data.Key.Name) { offsetID = offsetID }).Initialize(this, new DataSource(BaseAddress + data.Value._dataOffset, data.Key.Size));
+                    _sectionList.Insert(2, Root.itemParam);
                 }
                 else if (data.Key.Name.StartsWith("s_wpnAnmCmdDataSet"))
                 {

@@ -1,4 +1,5 @@
 using BrawlLib.Internal;
+using BrawlLib.SSBB.ResourceNodes.Moveset.Converters;
 using BrawlLib.SSBB.Types;
 using OpenTK.Graphics.OpenGL;
 using System;

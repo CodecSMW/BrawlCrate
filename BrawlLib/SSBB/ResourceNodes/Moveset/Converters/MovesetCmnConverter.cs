@@ -7,7 +7,7 @@ using System.Configuration;
 using System.Net;
 using static BrawlLib.SSBB.Types.hkClassMember;
 
-namespace BrawlLib.SSBB.ResourceNodes
+namespace BrawlLib.SSBB.ResourceNodes.Moveset.Converters
 {
     public unsafe class MovesetCmnConverter : MovesetConverter
     {
@@ -355,26 +355,26 @@ namespace BrawlLib.SSBB.ResourceNodes
             header->Unknown10 = Rebuild(RootNode, node.ambigNode[10], ref dataAddress, baseAddress);
             header->Unknown16 = Rebuild(RootNode, node.ambigNode[16], ref dataAddress, baseAddress);
             header->Unknown18 = Rebuild(RootNode, node.ambigNode[18], ref dataAddress, baseAddress);
-            header->Unknown0 = Rebuild(RootNode, node.ambigNode[0], ref dataAddress, baseAddress); //Global IC-Basics
-            header->Unknown2 = Rebuild(RootNode, node.ambigNode[2], ref dataAddress, baseAddress); //IC-Basics
+            header->IC_Basics_Global = Rebuild(RootNode, node.ambigNode[0], ref dataAddress, baseAddress); //Global IC-Basics
+            header->IC_Basics = Rebuild(RootNode, node.ambigNode[2], ref dataAddress, baseAddress); //IC-Basics
             header->Unknown12 = Rebuild(RootNode, node.ambigNode[12], ref dataAddress, baseAddress);
             header->Unknown13 = Rebuild(RootNode, node.ambigNode[13], ref dataAddress, baseAddress);
             header->Unknown14 = Rebuild(RootNode, node.ambigNode[14], ref dataAddress, baseAddress);
             header->Unknown15 = Rebuild(RootNode, node.ambigNode[15], ref dataAddress, baseAddress);
-            header->Unknown1 = Rebuild(RootNode, node.ambigNode[1], ref dataAddress, baseAddress); //SSE Global IC-Basics
-            header->Unknown3 = Rebuild(RootNode, node.ambigNode[3], ref dataAddress, baseAddress); //SSE IC-Basics
+            header->IC_Basics_Global_SSE = Rebuild(RootNode, node.ambigNode[1], ref dataAddress, baseAddress); //SSE Global IC-Basics
+            header->IC_Basics_SSE = Rebuild(RootNode, node.ambigNode[3], ref dataAddress, baseAddress); //SSE IC-Basics
             header->Unknown9 = Rebuild(RootNode, node.ambigNode[9], ref dataAddress, baseAddress); //itemSwingData
             header->Unknown17 = Rebuild(RootNode, node.ambigNode[17], ref dataAddress, baseAddress); //patternPowerMul
 
             //These relate to rotation configurations within ambigNode[23]
-            MoveDefNode._lookupOffsets.Add(header->Unknown0 + 0x64); // Global IC-Basics
-            MoveDefNode._lookupOffsets.Add(header->Unknown1 + 0x64);
-            MoveDefNode._lookupOffsets.Add(header->Unknown2 + 0x72C);// IC-Basics
-            MoveDefNode._lookupOffsets.Add(header->Unknown2 + 0x768);
-            MoveDefNode._lookupOffsets.Add(header->Unknown2 + 0x7DC);
-            MoveDefNode._lookupOffsets.Add(header->Unknown3 + 0x72C);
-            MoveDefNode._lookupOffsets.Add(header->Unknown3 + 0x768);
-            MoveDefNode._lookupOffsets.Add(header->Unknown3 + 0x7DC);
+            MoveDefNode._lookupOffsets.Add(header->IC_Basics_Global + 0x64); // Global IC-Basics
+            MoveDefNode._lookupOffsets.Add(header->IC_Basics_Global_SSE + 0x64);
+            MoveDefNode._lookupOffsets.Add(header->IC_Basics + 0x72C);// IC-Basics
+            MoveDefNode._lookupOffsets.Add(header->IC_Basics + 0x768);
+            MoveDefNode._lookupOffsets.Add(header->IC_Basics + 0x7DC);
+            MoveDefNode._lookupOffsets.Add(header->IC_Basics_SSE + 0x72C);
+            MoveDefNode._lookupOffsets.Add(header->IC_Basics_SSE + 0x768);
+            MoveDefNode._lookupOffsets.Add(header->IC_Basics_SSE + 0x7DC);
             #endregion
 
             #region Part 2
@@ -468,7 +468,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                     bint value = (grp._unk1 << 24) +
                         (grp._unk2 << 16) +
                         (grp._unk3 << 8) +
-                        (grp._unk4);
+                        grp._unk4;
 
                     flashOverlayOffsets[grp.Index * 2] = Rebuild(RootNode, grp, ref dataAddress,
                         baseAddress);
@@ -488,7 +488,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                     bint value = (grp._unk1 << 24) +
                         (grp._unk2 << 16) +
                         (grp._unk3 << 8) +
-                        (grp._unk4);
+                        grp._unk4;
 
                     screenOverlayOffsets[grp.Index * 2] = Rebuild(RootNode, grp, ref dataAddress,
                         baseAddress);

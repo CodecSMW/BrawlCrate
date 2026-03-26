@@ -1,29 +1,31 @@
 ﻿using BrawlLib.Internal;
+using BrawlLib.SSBB.ResourceNodes.Moveset.Converters;
 using BrawlLib.SSBB.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace BrawlLib.SSBB.ResourceNodes
 {
     public unsafe class MoveDefAnimParamNode : MoveDefEntryNode
     {
-        internal AnimParamHeader* Header => (AnimParamHeader*) WorkingUncompressed.Address;
+        internal AnimParamHeader* Header => (AnimParamHeader*)WorkingUncompressed.Address;
 
         public override ResourceType ResourceFileType => ResourceType.MDefAnimParam;
         public List<SpecialOffset> specialOffsets = new List<SpecialOffset>();
         internal uint DataLen;
         private int unk14, unk14b;
 
-        [Category("Data Offsets")] public int SubactionFlags => Header->Unknown0;
+        [Category("Data Offsets")] public int SubactionFlags => Header->SubactionFlagsStart;
 
-        [Category("Data Offsets")] public int SubactionFlagsCount => Header->Unknown1;
+        [Category("Data Offsets")] public int SubactionFlagsCount => Header->SubactionCount;
 
-        [Category("Data Offsets")] public int ActionFlags => Header->Unknown2;
+        [Category("Data Offsets")] public int ActionFlags => Header->ActionFlagsStart;
 
-        [Category("Data Offsets")] public int ActionFlagsCount => Header->Unknown3;
+        [Category("Data Offsets")] public int ActionFlagsCount => Header->ActionCount;
 
         [Category("Data Offsets")] public int Unk4 => Header->Unknown4;
 
@@ -49,13 +51,13 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         [Category("Data Offsets")] public int Unk15 => Header->Unknown15;
 
-        [Category("Data Offsets")] public int CollGenType => unk14;
-        [Category("Data Offsets")] public int CollGenTypeCnt => unk14b;
 
         public MoveDefFlagsNode _animFlags;
         public MoveDefActionFlagsNode actionFlags;
         public MoveDefSectionParamNode physNode, effNode;
         public MoveDefMiscHurtBoxesNode hurtboxes, shieldboxes;
+        public MoveDefActionListNode subActions, actions, hiddenActions;
+        public CollisionDataNode collision;
 
         public MoveDefAnimParamNode(uint dataLen, string name)
         {
@@ -63,23 +65,36 @@ namespace BrawlLib.SSBB.ResourceNodes
             _name = name;
         }
 
+        public FDefSubActionStringTable subActionTable;
+        public VoidPtr dataHeaderAddr;
+
+        public int
+            part1Len = 0,
+            part2Len = 0,
+            part3Len = 0,
+            part4Len = 0,
+            part5Len = 0,
+            part6Len = 0,
+            part7Len = 0,
+            part8Len = 0;
+
         public override bool OnInitialize()
         {
             //base.OnInitialize();
             bint* current = (bint*)Header;
             for (int i = 0; i < 16; i++)
             {
-                specialOffsets.Add(new SpecialOffset { Index = i, Offset = *current++});
+                specialOffsets.Add(new SpecialOffset { Index = i, Offset = *current++ });
             }
+            //CalculateDataLen();
             return true;
         }
 
-        public VoidPtr dataHeaderAddr;
 
         public override void OnPopulate()
         {
-            //Accounted for: 0-3, 5-11
-            //Unaccounted for: 4, 12-15
+            //Accounted for: 0-3, 5-15
+            //Unaccounted for: 4
 
             //4 in N/A?
             //12 in WarioBike (size 0x0C "0xD18"), RobotGyro ("0xB78"), Metroid ("0xCDC"), Starfy ("0x15F0"), Sonans ("0x818")
@@ -94,10 +109,9 @@ namespace BrawlLib.SSBB.ResourceNodes
             bint* actionOffset;
             List<int> ActionOffsets;
 
-            MoveDefActionListNode subActions =
-                    new MoveDefActionListNode { _name = "SubAction Scripts", _parent = this },
-                actions = new MoveDefActionListNode { _name = "Action Scripts", _parent = this },
-                hiddenActions = new MoveDefActionListNode { _name = "Hidden Action Scripts", _parent = this };
+            subActions = new MoveDefActionListNode { _name = "SubAction Scripts", _parent = this };
+            actions = new MoveDefActionListNode { _name = "Action Scripts", _parent = this };
+            hiddenActions = new MoveDefActionListNode { _name = "Hidden Action Scripts", _parent = this };
             #region actions
             for (int i = 10; i < 12; i++)
             {
@@ -123,7 +137,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                 if (specialOffsets[2] != null)
                 {
-                    (actionFlags = new MoveDefActionFlagsNode("Item Action Flags",ActionFlagsCount)
+                    (actionFlags = new MoveDefActionFlagsNode("Item Action Flags", ActionFlagsCount)
                     { offsetID = 2 }).Initialize(this,
                         new DataSource(BaseAddress + specialOffsets[2].Offset, ActionFlagsCount * 16));
                 }
@@ -155,7 +169,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             if (SubactionFlagsCount != 0)
             {
                 (_animFlags = new MoveDefFlagsNode { offsetID = 0, _parent = this }).Initialize(this,
-                    BaseAddress + specialOffsets[0].Offset, specialOffsets[0].Size);
+                    BaseAddress + specialOffsets[0].Offset, SubactionFlagsCount * 8);
             }
             for (int i = 7; i < 10; i++)
             {
@@ -209,6 +223,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                 //Add to children (because the parent was set before initialization)
                 Children.Add(subActions);
+                Root._subActions = subActions;
             }
             #endregion
 
@@ -225,11 +240,12 @@ namespace BrawlLib.SSBB.ResourceNodes
                 effNode = new MoveDefSectionParamNode { _name = "Effect Base Node" };
                 effNode.Initialize(this, BaseAddress + addr[0], addr[1] * 4);
             }
+
             if (HitData != 0)
             {
                 bint* addr = (bint*)(BaseAddress + specialOffsets[12].Offset);
                 hurtboxes = new MoveDefMiscHurtBoxesNode(addr[1]);
-                hurtboxes.Initialize(this, BaseAddress + addr[0], addr[1]*0x20);
+                hurtboxes.Initialize(this, BaseAddress + addr[0], addr[1] * 0x20);
                 hurtboxes._name = "Override Hurtbox List";
             }
             if (specialOffsets[13].Offset != 0) //Reflect/Shield Type
@@ -241,13 +257,9 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
             if (specialOffsets[14].Offset != 0) //ECB Type
             {
-                VoidPtr* addr = (VoidPtr*)(BaseAddress + specialOffsets[14].Offset);
-                bint* addr_cnt = (bint*)addr;
-                byte* addr_b = (byte*)addr;
-                unk14b = addr_cnt[1];
-                unk14 = addr_cnt[0];
-                addr_b = (byte*)(BaseAddress + unk14);
-                unk14 = addr_b[0];
+                collision = new CollisionDataNode();
+                collision.Initialize(this, BaseAddress + specialOffsets[14].Offset, 0);
+                collision._name = "Override Collision Info";
             }
             #endregion
 
@@ -312,6 +324,51 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                 i++;
             }
+        }
+
+        public override int OnCalculateSize(bool force)
+        {
+            _entryLength = 124;// 124;
+            _childLength = MovesetItemConverter.CalcDataSize(this);
+            return _entryLength + _childLength;
+        }
+
+        public override void OnRebuild(VoidPtr address, int length, bool force)
+        {
+            MovesetItemConverter.BuildData(this, (AnimParamHeader*)dataHeaderAddr, address, length, force);
+        }
+
+    }
+
+    public unsafe class MoveDefItemParamNode : MoveDefEntryNode
+    {
+        internal VoidPtr* Header => (VoidPtr*)WorkingUncompressed.Address;
+        internal uint DataLen;
+        public ItmParamEntryNode itemEntry;
+        //public override ResourceType ResourceFileType => ResourceType.NoEditFolder;
+        public MoveDefItemParamNode(uint dataLen, string name)
+        {
+            DataLen = dataLen;
+            _name = name;
+        }
+        public override bool OnInitialize()
+        {
+            return true;
+        }
+
+        public override void OnPopulate()
+        {
+            itemEntry = new ItmParamEntryNode() { _name = "Entry" };
+            itemEntry.Initialize(this, Header, ItmParamEntry.Size);
+        }
+        public override int OnCalculateSize(bool force)
+        {
+            return ItmParamEntry.Size;
+        }
+        public override void OnRebuild(VoidPtr address, int length, bool force)
+        {
+            _entryOffset = address;
+            itemEntry.Rebuild(address, ItmParamEntry.Size, force);
         }
     }
 }

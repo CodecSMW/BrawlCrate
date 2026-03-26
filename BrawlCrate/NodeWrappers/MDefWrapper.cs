@@ -3,6 +3,7 @@ using BrawlLib.Internal;
 using BrawlLib.Internal.Windows.Forms;
 using BrawlLib.SSBB;
 using BrawlLib.SSBB.ResourceNodes;
+using BrawlLib.SSBB.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1394,6 +1395,7 @@ namespace BrawlCrate.NodeWrappers
             _menu = new ContextMenuStrip();
             _menu.Items.Add(new ToolStripMenuItem("Add Hurtbox Overrides", null, HurtboxListAdd, Keys.Control | Keys.H));
             _menu.Items.Add(new ToolStripMenuItem("Add Reflectbox Overrides", null, ShieldboxListAdd, Keys.Control | Keys.R));
+            _menu.Items.Add(new ToolStripMenuItem("Add Collision Diamond Overrides", null, CollisionListAdd, Keys.Control | Keys.D));
             _menu.Items.Add(new ToolStripMenuItem("Add Item Param Section", null, ItmParamAddAction, Keys.Control | Keys.I));
             _menu.Items.Add(new ToolStripSeparator());
             _menu.Items.Add(new ToolStripMenuItem("&Export", null, ExportAction, Keys.Control | Keys.E));
@@ -1413,7 +1415,8 @@ namespace BrawlCrate.NodeWrappers
 
             _menu.Items[0].Enabled = (param.hurtboxes == null) ? true : false;
             _menu.Items[1].Enabled = (param.shieldboxes == null) ? true : false;
-            _menu.Items[2].Enabled = (section.Children.Count == 2) ? true : false;
+            _menu.Items[2].Enabled = (param.collision == null) ? true : false;
+            _menu.Items[3].Enabled = (section.Children.Count == 2) ? true : false;
         }
 
         #endregion
@@ -1443,6 +1446,21 @@ namespace BrawlCrate.NodeWrappers
             param.AddChild(param.shieldboxes);
         }
 
+        protected static void CollisionListAdd(object sender, EventArgs e)
+        {
+            MDefAnimParamWrapper w = GetInstance<MDefAnimParamWrapper>();
+            MoveDefAnimParamNode param = w.Resource as MoveDefAnimParamNode;
+            param.collision = new CollisionDataNode();
+            param.collision._name = "Override Collision Info";
+            MoveDefOffsetNode offsetNode = new MoveDefOffsetNode() { _name = "Entry" };
+            CollDataType0 collData = new CollDataType0() { _name = "Data" };
+            collData.AddChild(new MoveDefBoneIndexNode());
+
+            offsetNode.AddChild(collData);
+            param.collision.AddChild(offsetNode);
+            param.AddChild(param.collision);
+        }
+
         protected static void ItmParamAddAction(object sender, EventArgs e)
         {
             GetInstance<MDefAnimParamWrapper>().ItmParamAdd();
@@ -1450,9 +1468,14 @@ namespace BrawlCrate.NodeWrappers
         public void ItmParamAdd()
         {
             MoveDefSectionNode section = Resource.Parent as MoveDefSectionNode;
-            ItmParamEntryNode itemInfo = new ItmParamEntryNode();
-            itemInfo.Name = "itemParam";
+
+            MoveDefItemParamNode itemInfo = new MoveDefItemParamNode(ItmParamEntry.Size,"itemParam");
+            ItmParamEntryNode itemEntry = new ItmParamEntryNode() { _name = "Entry" };
+            itemEntry.TemplateSettings();
+            itemInfo.AddChild(itemEntry);
+            itemInfo.itemEntry = itemEntry;
             section.AddChild(itemInfo);
+            section._sectionList.Add(itemInfo);
         }
         
 

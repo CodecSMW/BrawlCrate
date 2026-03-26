@@ -1388,7 +1388,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         [Category("Collision Data Type 0")] public int Offset => offset;
 
-        [Category("Collision Data Type 0")] public int Count => count;
+        [Category("Collision Data Type 0")] public int Count => Children.Count;
 
         [Category("Collision Data Type 0")]
         public float Unknown1

@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Policy;
+using System.Windows.Forms;
 
-namespace BrawlLib.SSBB.ResourceNodes
+namespace BrawlLib.SSBB.ResourceNodes.Moveset.Converters
 {
     public unsafe class MovesetConverter
     {
@@ -78,36 +79,6 @@ namespace BrawlLib.SSBB.ResourceNodes
         //References Offsets
         //Sections/References String Table
 
-        public static int CalcDataSize2()
-        {
-            int size = 0;
-            foreach (MoveDefEntryNode e in MoveDefNode.nodeDictionary.Values)
-            {
-                if (e.External && !(e._extNode is MoveDefReferenceEntryNode))
-                {
-                    continue;
-                }
-
-                size += e.CalculateSize(true);
-            }
-
-            return size;
-        }
-
-        public static void BuildData2(MoveDefDataNode node, MovesetHeader* header, VoidPtr address, int length,
-                                      bool force)
-        {
-            VoidPtr addr = address;
-            foreach (MoveDefEntryNode e in MoveDefNode.nodeDictionary.Values)
-            {
-                if (e.External && !(e._extNode is MoveDefReferenceEntryNode))
-                {
-                    continue;
-                }
-
-                e.Rebuild(addr, e._calcSize, true);
-            }
-        }
 
         internal static void AddNamedAction(List<MoveDefEntryNode> named, MoveDefActionNode node)
         {
@@ -143,21 +114,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             part1Len += GetSize(node.commonActionFlags, ref lookupCount);
             part1Len += GetSize(node.unk7, ref lookupCount);
 
-            foreach (MoveDefSubActionGroupNode g in RootNode._subActions.Children)
-            {
-                if (g.Name != "<null>")
-                {
-                    //bool forceWrite = ForceSubActionWrite(g);
-                    foreach (MoveDefActionNode a in g.Children)
-                    {
-                        if (a.Children.Count > 0 || a._actionRefs.Count > 0 || a._build)
-                        {
-                            part1Len += GetSize(a, ref lookupCount);
-                            lookupCount++;
-                        }
-                    }
-                }
-            }
+            part1Len += Calc_Actions(RootNode._subActions, ref lookupCount);
 
             part1Len += CalcSizeArticleActions(node, ref lookupCount, true, 0);
 
@@ -174,27 +131,11 @@ namespace BrawlLib.SSBB.ResourceNodes
                     part1Len += r.Children.Count * 4;
                 }
             }
-
-            foreach (MoveDefActionGroupNode a in RootNode._actions.Children)
-            {
-                if (a.Children[0].Children.Count > 0 || (a.Children[0] as MoveDefActionNode)._actionRefs.Count > 0 ||
-                    (a.Children[0] as MoveDefActionNode)._build) //Entry
-                {
-                    part1Len += GetSize(a.Children[0] as MoveDefActionNode, ref lookupCount);
-                    lookupCount++;
-                }
-
-                if (a.Children[1].Children.Count > 0 || (a.Children[1] as MoveDefActionNode)._actionRefs.Count > 0 ||
-                    (a.Children[1] as MoveDefActionNode)._build) //Exit
-                {
-                    part1Len += GetSize(a.Children[1] as MoveDefActionNode, ref lookupCount);
-                    lookupCount++;
-                }
-            }
+            part1Len += Calc_Actions(RootNode._actions, ref lookupCount);
 
             #endregion
 
-            #region Part 2
+            #region Part 2: Misc Data and Subroutines
 
             part2Len += GetSize(node.misc.unkSection1, ref lookupCount);
 
@@ -253,7 +194,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             #endregion
 
-            #region Part 3
+            #region Part 3: Action Pre Entries
 
             //Actions part 1 and 2 offsets
             lookupCount += 2; //offset to the lists
@@ -265,7 +206,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             #region Part 4
 
-            //Subaction flags
+            //Subaction Names
             lookupCount++; //offset to the list
             foreach (MoveDefSubActionGroupNode g in RootNode._subActions.Children)
             {
@@ -421,7 +362,9 @@ namespace BrawlLib.SSBB.ResourceNodes
                 {
                     node._lookupOffsets = new List<int>();
 
-                    if ((node.Parent is MoveDefDataNode || node.Parent is MoveDefMiscNode) && !node.isExtra)
+                    if ((node.Parent is MoveDefDataNode ||  //Fighters
+                        node.Parent is MoveDefAnimParamNode || //Items
+                        node.Parent is MoveDefMiscNode) && !node.isExtra)
                     {
                         lookupCount++;
                     }
@@ -429,38 +372,6 @@ namespace BrawlLib.SSBB.ResourceNodes
                     size = node.CalculateSize(true);
                     lookupCount += node._lookupCount;
                 }
-
-                /*
-                MoveDefEntryNode next = node;
-                Top:
-                //Check for random params around the file
-                if (next.Parent is MoveDefDataNode)
-                {
-                    if (next.Parent.Children.Count > next.Index + 1)
-                    {
-                        if (
-                            (next = next.Parent.Children[next.Index + 1] as MoveDefEntryNode) is
-                            MoveDefCharSpecificNode || next is MoveDefRawDataNode && next.Children.Count > 0 &&
-                            next.Children[0] is MoveDefSectionParamNode)
-                        {
-                            if (!(next is MoveDefRawDataNode))
-                            {
-                                size += next.CalculateSize(true);
-                                lookupCount += next._lookupCount;
-                            }
-                            else
-                            {
-                                foreach (MoveDefSectionParamNode p in next.Children)
-                                {
-                                    size += p.CalculateSize(true);
-                                }
-                            }
-
-                            goto Top;
-                        }
-                    }
-                }
-                */
                 return size;
             }
 
@@ -528,43 +439,11 @@ namespace BrawlLib.SSBB.ResourceNodes
 
             header->Unknown7 = Rebuild(RootNode, node.unk7, ref dataAddress, baseAddress);
 
-            foreach (MoveDefSubActionGroupNode grp in RootNode._subActions.Children)
-            {
-                if (grp.Name != "<null>")
-                {
-                    if (grp.Children[3].Children.Count > 0 ||
-                        ((MoveDefActionNode) grp.Children[3])._actionRefs.Count > 0 ||
-                        ((MoveDefActionNode) grp.Children[3])._build)
-                    {
-                        otherOffsets[grp.Index] = Rebuild(RootNode, grp.Children[3] as MoveDefActionNode,
-                            ref dataAddress, baseAddress);
-                        MoveDefNode._lookupOffsets.Add((int) &otherOffsets[grp.Index] - (int) baseAddress);
-                    }
-                    else
-                    {
-                        otherOffsets[grp.Index] = 0;
-                    }
-                }
-            }
 
-            foreach (MoveDefSubActionGroupNode grp in RootNode._subActions.Children)
-            {
-                if (grp.Name != "<null>")
-                {
-                    if (grp.Children[1].Children.Count > 0 ||
-                        ((MoveDefActionNode) grp.Children[1])._actionRefs.Count > 0 ||
-                        ((MoveDefActionNode) grp.Children[1])._build)
-                    {
-                        GFXOffsets[grp.Index] = Rebuild(RootNode, grp.Children[1] as MoveDefActionNode, ref dataAddress,
-                            baseAddress);
-                        MoveDefNode._lookupOffsets.Add((int) &GFXOffsets[grp.Index] - (int) baseAddress);
-                    }
-                    else
-                    {
-                        GFXOffsets[grp.Index] = 0;
-                    }
-                }
-            }
+            Rebuild_Actions(ref otherOffsets, 3, RootNode._subActions,RootNode, ref dataAddress, baseAddress); //Other
+            Rebuild_Actions(ref GFXOffsets, 1, RootNode._subActions, RootNode, ref dataAddress, baseAddress); //GFX
+            Rebuild_Actions(ref SFXOffsets, 2, RootNode._subActions, RootNode, ref dataAddress, baseAddress); //SFX
+            Rebuild_Actions(ref mainOffsets, 0, RootNode._subActions, RootNode, ref dataAddress, baseAddress); //Main
 
             RebuildArticleActions(RootNode, node, ref dataAddress, baseAddress, true, 1);
 
@@ -572,25 +451,6 @@ namespace BrawlLib.SSBB.ResourceNodes
                 Rebuild(RootNode, node.misc.unkBoneSection, ref dataAddress, baseAddress)) > 0)
             {
                 miscOffsetsAddr->UnkBoneSectionCount = node.misc.unkBoneSection.Children.Count;
-            }
-
-            foreach (MoveDefSubActionGroupNode grp in RootNode._subActions.Children)
-            {
-                if (grp.Name != "<null>")
-                {
-                    if (grp.Children[2].Children.Count > 0 ||
-                        ((MoveDefActionNode) grp.Children[2])._actionRefs.Count > 0 ||
-                        ((MoveDefActionNode) grp.Children[2])._build)
-                    {
-                        SFXOffsets[grp.Index] = Rebuild(RootNode, grp.Children[2] as MoveDefActionNode, ref dataAddress,
-                            baseAddress);
-                        MoveDefNode._lookupOffsets.Add((int) &SFXOffsets[grp.Index] - (int) baseAddress);
-                    }
-                    else
-                    {
-                        SFXOffsets[grp.Index] = 0;
-                    }
-                }
             }
 
             RebuildArticleActions(RootNode, node, ref dataAddress, baseAddress, true, 2);
@@ -608,47 +468,11 @@ namespace BrawlLib.SSBB.ResourceNodes
                 }
             }
 
-            foreach (MoveDefSubActionGroupNode grp in RootNode._subActions.Children)
-            {
-                if (grp.Name != "<null>")
-                {
-                    if (grp.Children[0].Children.Count > 0 ||
-                        ((MoveDefActionNode) grp.Children[0])._actionRefs.Count > 0 ||
-                        ((MoveDefActionNode) grp.Children[0])._build)
-                    {
-                        mainOffsets[grp.Index] = Rebuild(RootNode, grp.Children[0] as MoveDefActionNode,
-                            ref dataAddress, baseAddress);
-                        MoveDefNode._lookupOffsets.Add((int) &mainOffsets[grp.Index] - (int) baseAddress);
-                    }
-                    else
-                    {
-                        mainOffsets[grp.Index] = 0;
-                    }
-                }
-            }
-
             RebuildArticleActions(RootNode, node, ref dataAddress, baseAddress, true, 0);
 
-            foreach (MoveDefActionGroupNode grp in RootNode._actions.Children)
-            {
-                if (grp.Children[0].Children.Count > 0 ||
-                    (grp.Children[0] as MoveDefActionNode)._actionRefs.Count > 0 ||
-                    (grp.Children[0] as MoveDefActionNode)._build) //Entry
-                {
-                    action1Offsets[grp.Index] = Rebuild(RootNode, grp.Children[0] as MoveDefActionNode, ref dataAddress,
-                        baseAddress);
-                    MoveDefNode._lookupOffsets.Add((int) &action1Offsets[grp.Index] - (int) baseAddress);
-                }
 
-                if (grp.Children[1].Children.Count > 0 ||
-                    (grp.Children[1] as MoveDefActionNode)._actionRefs.Count > 0 ||
-                    (grp.Children[1] as MoveDefActionNode)._build) //Exit
-                {
-                    action2Offsets[grp.Index] = Rebuild(RootNode, grp.Children[1] as MoveDefActionNode, ref dataAddress,
-                        baseAddress);
-                    MoveDefNode._lookupOffsets.Add((int) &action2Offsets[grp.Index] - (int) baseAddress);
-                }
-            }
+            Rebuild_Actions(ref action1Offsets, 0, RootNode._actions, RootNode, ref dataAddress, baseAddress); //Entry
+            Rebuild_Actions(ref action2Offsets, 1, RootNode._actions, RootNode, ref dataAddress, baseAddress); //Exit
 
             #endregion
 
@@ -834,69 +658,10 @@ namespace BrawlLib.SSBB.ResourceNodes
                 extraOffsets[2] = (int) SFX2Offsets - (int) baseAddress;
                 extraOffsets[3] = (int) other2Offsets - (int) baseAddress;
 
-                foreach (MoveDefSubActionGroupNode grp in node.nanaSubActions.Children)
-                {
-                    if (grp.Name != "<null>" && (grp.Children[3].Children.Count > 0 ||
-                                                 ((MoveDefActionNode) grp.Children[3])._actionRefs.Count > 0 ||
-                                                 ((MoveDefActionNode) grp.Children[3])._build))
-                    {
-                        other2Offsets[grp.Index] = Rebuild(RootNode, grp.Children[3] as MoveDefActionNode,
-                            ref dataAddress, baseAddress);
-                        MoveDefNode._lookupOffsets.Add((int) &other2Offsets[grp.Index] - (int) baseAddress);
-                    }
-                    else
-                    {
-                        other2Offsets[grp.Index] = 0;
-                    }
-                }
-
-                foreach (MoveDefSubActionGroupNode grp in node.nanaSubActions.Children)
-                {
-                    if (grp.Name != "<null>" && (grp.Children[1].Children.Count > 0 ||
-                                                 ((MoveDefActionNode) grp.Children[1])._actionRefs.Count > 0 ||
-                                                 ((MoveDefActionNode) grp.Children[1])._build))
-                    {
-                        GFX2Offsets[grp.Index] = Rebuild(RootNode, grp.Children[1] as MoveDefActionNode,
-                            ref dataAddress, baseAddress);
-                        MoveDefNode._lookupOffsets.Add((int) &GFX2Offsets[grp.Index] - (int) baseAddress);
-                    }
-                    else
-                    {
-                        GFX2Offsets[grp.Index] = 0;
-                    }
-                }
-
-                foreach (MoveDefSubActionGroupNode grp in node.nanaSubActions.Children)
-                {
-                    if (grp.Name != "<null>" && (grp.Children[2].Children.Count > 0 ||
-                                                 ((MoveDefActionNode) grp.Children[2])._actionRefs.Count > 0 ||
-                                                 ((MoveDefActionNode) grp.Children[2])._build))
-                    {
-                        SFX2Offsets[grp.Index] = Rebuild(RootNode, grp.Children[2] as MoveDefActionNode,
-                            ref dataAddress, baseAddress);
-                        MoveDefNode._lookupOffsets.Add((int) &SFX2Offsets[grp.Index] - (int) baseAddress);
-                    }
-                    else
-                    {
-                        SFX2Offsets[grp.Index] = 0;
-                    }
-                }
-
-                foreach (MoveDefSubActionGroupNode grp in node.nanaSubActions.Children)
-                {
-                    if (grp.Name != "<null>" && (grp.Children[0].Children.Count > 0 ||
-                                                 ((MoveDefActionNode) grp.Children[0])._actionRefs.Count > 0 ||
-                                                 ((MoveDefActionNode) grp.Children[0])._build))
-                    {
-                        main2Offsets[grp.Index] = Rebuild(RootNode, grp.Children[0] as MoveDefActionNode,
-                            ref dataAddress, baseAddress);
-                        MoveDefNode._lookupOffsets.Add((int) &main2Offsets[grp.Index] - (int) baseAddress);
-                    }
-                    else
-                    {
-                        main2Offsets[grp.Index] = 0;
-                    }
-                }
+                Rebuild_Actions(ref other2Offsets, 3, node.nanaSubActions, RootNode, ref dataAddress, baseAddress); //Other
+                Rebuild_Actions(ref GFX2Offsets, 1, node.nanaSubActions, RootNode, ref dataAddress, baseAddress); //GFX
+                Rebuild_Actions(ref SFX2Offsets, 2, node.nanaSubActions, RootNode, ref dataAddress, baseAddress); //SFX
+                Rebuild_Actions(ref main2Offsets, 0, node.nanaSubActions, RootNode, ref dataAddress, baseAddress); //Main
 
                 dataAddress = (VoidPtr) other2Offsets + node.nanaSubActions.Children.Count * 4;
             }
@@ -964,7 +729,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                         MoveDefNode._lookupOffsets.Add((int) sndLists->_startOffset.Address - (int) baseAddress);
                     }
 
-                    (sndLists++)->_listCount = r.Children.Count;
+                    sndLists++->_listCount = r.Children.Count;
                 }
 
                 dataAddress = sndLists;
@@ -1121,11 +886,85 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
             //dataAddress += 0x110; //suspect way to deal with corruption?
 
-            //Go back and add offsets to nodes that need them
+            Rebuild_PostProcess(RootNode);
+        }
+
+        ///<summary>Goes back and add offsets to nodes that need them.</summary>
+        public static void Rebuild_PostProcess(MoveDefNode RootNode)
+        {
             foreach (MoveDefEntryNode entry in RootNode._postProcessNodes)
             {
                 entry.PostProcess();
             }
+        }
+
+        public static int Calc_Actions(MoveDefActionListNode actionList, ref int lookupCount)
+        {
+            int partLen = 0;
+            bool isSubActionGroup = false;
+            foreach (MoveDefActionGroupNode g in actionList.Children)
+            {
+                isSubActionGroup = g is MoveDefSubActionGroupNode;
+                if (!isSubActionGroup || g.Name != "<null>")
+                {
+                    foreach (MoveDefActionNode a in g.Children)
+                    {
+                        if (a.Children.Count > 0 || a._actionRefs.Count > 0)// || a._build)
+                        {
+                            partLen += GetSize(a, ref lookupCount);
+                            lookupCount++;
+                        }
+                    }
+                }
+            }
+            return partLen;
+        }
+        public static void Rebuild_Actions(ref bint* offsets, int category, MoveDefActionListNode actionList, MoveDefNode RootNode, ref VoidPtr dataAddress, VoidPtr baseAddress)
+        {
+            foreach (MoveDefActionGroupNode grp in actionList.Children)
+            {
+                if (grp.Name != "<null>")
+                {
+                    if (grp.Children[category].Children.Count > 0 ||
+                        (grp.Children[category] as MoveDefActionNode)._actionRefs.Count > 0)
+                        //(grp.Children[category] as MoveDefActionNode)._build)
+                    {
+                        offsets[grp.Index] = Rebuild(RootNode, grp.Children[category] as MoveDefActionNode,
+                            ref dataAddress, baseAddress);
+                        MoveDefNode._lookupOffsets.Add((int)&offsets[grp.Index] - (int)baseAddress);
+                    }
+                    else
+                    {
+                        offsets[grp.Index] = 0;
+                    }
+                }
+            }
+        }
+
+        public static void Rebuild_Sub_Names(ref VoidPtr dataAddress, VoidPtr baseAddress, MoveDefActionListNode actionList, FDefSubActionStringTable stringTable)
+        {
+            int index = 0;
+            FDefSubActionFlag* flags = (FDefSubActionFlag*)dataAddress;
+            foreach (MoveDefSubActionGroupNode g in actionList.Children)
+            {
+                *flags = new FDefSubActionFlag
+                {
+                    _InTranslationTime = g._inTransTime,
+                    _Flags = g._flags,
+                    _stringOffset = g.Name == "<null>" ? 0 : (int)stringTable[g.Name] - (int)baseAddress
+                };
+
+                if (flags->_stringOffset > 0)
+                {
+
+                    MoveDefNode._lookupOffsets.Add((int)flags->_stringOffset.Address - (int)baseAddress);
+                }
+
+                flags++;
+                index++;
+            }
+
+            dataAddress = flags;
         }
 
         public static int Rebuild(MoveDefNode root, MoveDefEntryNode node, ref VoidPtr dataAddress, VoidPtr baseAddress)
@@ -1144,46 +983,6 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                     MoveDefNode._lookupOffsets.AddRange(node._lookupOffsets.ToArray());
                 }
-                /*
-                MoveDefEntryNode next = node;
-                Top:
-                //Check for random params around the file
-                
-                if (next.Parent is MoveDefDataNode)
-                {
-                    if (next.Parent.Children.Count > next.Index + 1)
-                    {
-                        if (
-                            (next = next.Parent.Children[next.Index + 1] as MoveDefEntryNode) is
-                            MoveDefCharSpecificNode || next is MoveDefRawDataNode && next.Children.Count > 0 &&
-                            next.Children[0] is MoveDefSectionParamNode)
-                        {
-                            if (!(next is MoveDefRawDataNode))
-                            {
-                                next.Rebuild(dataAddress, next._calcSize, true);
-                                MoveDefNode._lookupOffsets.AddRange(next._lookupOffsets.ToArray());
-                                dataAddress += next._calcSize;
-
-                                if (next._lookupCount != next._lookupOffsets.Count)
-                                {
-                                    Console.WriteLine();
-                                }
-                            }
-                            else
-                            {
-                                next._entryOffset = dataAddress;
-                                foreach (MoveDefSectionParamNode p in next.Children)
-                                {
-                                    p.Rebuild(dataAddress, p.AttributeBuffer.Length, true);
-                                    dataAddress += p.AttributeBuffer.Length;
-                                }
-                            }
-
-                            goto Top;
-                        }
-                    }
-                }
-                */
                 return node._rebuildOffset;
             }
             else
@@ -1502,16 +1301,5 @@ namespace BrawlLib.SSBB.ResourceNodes
         //patternPowerMul events
         //Sections data
         //dataCommon header
-
-        public static int CalcDataCommonSize(MoveDefDataCommonNode node)
-        {
-            return 0;
-        }
-
-        internal static void BuildDataCommon(MoveDefNode root, MoveDefEntryNode node, ref VoidPtr dataAddress, VoidPtr baseAddress)
-        {
-            //TODO: This needs to base off BuildData!!!
-            Rebuild(root, node, ref dataAddress, baseAddress);
-        }
     }
 }

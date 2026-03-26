@@ -55,13 +55,15 @@ namespace BrawlLib.SSBB.ResourceNodes
         public override int OnCalculateSize(bool force)
         {
             _lookupCount = 2; // one each for unk1 and unk2
+            unk2.CalculateSize(true);
+            unk4.CalculateSize(true);
             return 24 + ((specialOffsets[3].Offset + 2 + specialOffsets[5].Offset) * 4);
         }
         public override void OnRebuild(VoidPtr address, int length, bool force)
         {
             _entryOffset = address;
             bint* data = (bint*)address;
-            VoidPtr dataAddress = (address + 0x10);
+            VoidPtr dataAddress = (address + 0x18);
             VoidPtr baseAddress = _rebuildBase;
             MoveDefNode RootNode = Parent.Parent as MoveDefNode;
             SubParamHeader* header = (SubParamHeader*)address;
@@ -92,11 +94,6 @@ namespace BrawlLib.SSBB.ResourceNodes
 
                     MoveDefNode._lookupOffsets.AddRange(node._lookupOffsets.ToArray());
                 }
-
-                MoveDefEntryNode next = node;
-            Top:
-
-
                 return node._rebuildOffset;
             }
             else

@@ -2683,4 +2683,9 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
     }
+
+    public unsafe class MoveDeItemCollNode : MoveDefEntryNode
+    {
+
+    }
 }

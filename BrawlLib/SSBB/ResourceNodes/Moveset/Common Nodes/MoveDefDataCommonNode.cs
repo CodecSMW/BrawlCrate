@@ -1,4 +1,5 @@
 using BrawlLib.Internal;
+using BrawlLib.SSBB.ResourceNodes.Moveset.Converters;
 using BrawlLib.SSBB.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,13 +16,13 @@ namespace BrawlLib.SSBB.ResourceNodes
         public List<SpecialOffset> specialOffsets = new List<SpecialOffset>();
         internal uint DataLen;
 
-        [Category("Data Offsets")] public int GlobalICBasics => Header->Unknown0;
+        [Category("Data Offsets")] public int GlobalICBasics => Header->IC_Basics_Global;
 
-        [Category("Data Offsets")] public int GlobalICBasicsSSE => Header->Unknown1;
+        [Category("Data Offsets")] public int GlobalICBasicsSSE => Header->IC_Basics_Global_SSE;
 
-        [Category("Data Offsets")] public int ICBasics => Header->Unknown2;
+        [Category("Data Offsets")] public int ICBasics => Header->IC_Basics;
 
-        [Category("Data Offsets")] public int ICBasicsSSE => Header->Unknown3;
+        [Category("Data Offsets")] public int ICBasicsSSE => Header->IC_Basics_SSE;
 
         [Category("Data Offsets")] public int EntryActions => Header->ActionsStart;
 
@@ -297,7 +298,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             _entryLength = 124;// 124;
             _childLength = MovesetCmnConverter.CalcDataSize(this);
             return _entryLength + _childLength;
-        } //TODO: Make accurate!
+        }
         
         public override void OnRebuild(VoidPtr address, int length, bool force)
         {
