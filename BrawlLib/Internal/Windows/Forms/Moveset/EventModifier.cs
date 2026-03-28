@@ -136,7 +136,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "Requirement"});
             this.cboType.Location = new System.Drawing.Point(46, 0);
             this.cboType.Name = "cboType";
-            this.cboType.Size = new System.Drawing.Size(82, 21);
+            this.cboType.Size = new System.Drawing.Size(82, 24);
             this.cboType.TabIndex = 63;
             this.cboType.SelectedIndexChanged += new System.EventHandler(this.cboType_SelectedIndexChanged);
             // 
@@ -144,6 +144,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             // 
             this.lstParameters.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstParameters.FormattingEnabled = true;
+            this.lstParameters.ItemHeight = 16;
             this.lstParameters.Location = new System.Drawing.Point(0, 21);
             this.lstParameters.Name = "lstParameters";
             this.lstParameters.Size = new System.Drawing.Size(137, 197);
@@ -271,7 +272,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.chkNot.AutoSize = true;
             this.chkNot.Location = new System.Drawing.Point(81, 3);
             this.chkNot.Name = "chkNot";
-            this.chkNot.Size = new System.Drawing.Size(43, 17);
+            this.chkNot.Size = new System.Drawing.Size(50, 20);
             this.chkNot.TabIndex = 65;
             this.chkNot.Text = "Not";
             this.chkNot.UseVisualStyleBackColor = true;
@@ -295,7 +296,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.cboRequirement.FormattingEnabled = true;
             this.cboRequirement.Location = new System.Drawing.Point(0, 22);
             this.cboRequirement.Name = "cboRequirement";
-            this.cboRequirement.Size = new System.Drawing.Size(141, 21);
+            this.cboRequirement.Size = new System.Drawing.Size(141, 24);
             this.cboRequirement.TabIndex = 0;
             this.cboRequirement.SelectedIndexChanged += new System.EventHandler(this.Requirement_Handle);
             // 
@@ -345,7 +346,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "Flash Overlays"});
             this.comboBox1.Location = new System.Drawing.Point(46, 0);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(95, 21);
+            this.comboBox1.Size = new System.Drawing.Size(95, 24);
             this.comboBox1.TabIndex = 7;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
@@ -357,7 +358,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.comboBox2.FormattingEnabled = true;
             this.comboBox2.Location = new System.Drawing.Point(46, 24);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(95, 21);
+            this.comboBox2.Size = new System.Drawing.Size(95, 24);
             this.comboBox2.TabIndex = 9;
             // 
             // comboBox3
@@ -368,7 +369,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.comboBox3.FormattingEnabled = true;
             this.comboBox3.Location = new System.Drawing.Point(46, 48);
             this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(95, 21);
+            this.comboBox3.Size = new System.Drawing.Size(95, 24);
             this.comboBox3.TabIndex = 11;
             // 
             // label2
@@ -433,8 +434,8 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.AutoScroll = true;
-            this.splitContainer1.Panel2.Controls.Add(this.spHitboxFlagPanel);
             this.splitContainer1.Panel2.Controls.Add(this.hitboxFlagPanel);
+            this.splitContainer1.Panel2.Controls.Add(this.spHitboxFlagPanel);
             this.splitContainer1.Panel2.Controls.Add(this.offsetPanel);
             this.splitContainer1.Panel2.Controls.Add(this.typePanel);
             this.splitContainer1.Panel2.Controls.Add(this.requirementPanel);
@@ -475,7 +476,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "KO after 100% (Custom)"});
             this.comboSpHit_BehaviorBox.Location = new System.Drawing.Point(10, 216);
             this.comboSpHit_BehaviorBox.Name = "comboSpHit_BehaviorBox";
-            this.comboSpHit_BehaviorBox.Size = new System.Drawing.Size(158, 79);
+            this.comboSpHit_BehaviorBox.Size = new System.Drawing.Size(158, 72);
             this.comboSpHit_BehaviorBox.TabIndex = 4;
             this.comboSpHit_BehaviorBox.SelectedIndexChanged += new System.EventHandler(this.comboSpHit_BehaviorBox_SelectedIndexChanged);
             this.comboSpHit_BehaviorBox.MouseLeave += new System.EventHandler(this.combooSpHit_checkedBoxLeave);
@@ -486,7 +487,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 5.2F);
             this.label9.Location = new System.Drawing.Point(6, 34);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(45, 7);
+            this.label9.Size = new System.Drawing.Size(56, 12);
             this.label9.TabIndex = 3;
             this.label9.Text = "KB Direction";
             // 
@@ -505,7 +506,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "Unused"});
             this.comboSpHit_KB_Box.Location = new System.Drawing.Point(68, 28);
             this.comboSpHit_KB_Box.Name = "comboSpHit_KB_Box";
-            this.comboSpHit_KB_Box.Size = new System.Drawing.Size(100, 21);
+            this.comboSpHit_KB_Box.Size = new System.Drawing.Size(100, 24);
             this.comboSpHit_KB_Box.TabIndex = 2;
             this.comboSpHit_KB_Box.SelectedIndexChanged += new System.EventHandler(this.comboSpHit_KB_Box_SelectedIndexChanged);
             // 
@@ -520,7 +521,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "Body"});
             this.comboSpHit_RegionBox.Location = new System.Drawing.Point(11, 146);
             this.comboSpHit_RegionBox.Name = "comboSpHit_RegionBox";
-            this.comboSpHit_RegionBox.Size = new System.Drawing.Size(157, 64);
+            this.comboSpHit_RegionBox.Size = new System.Drawing.Size(157, 55);
             this.comboSpHit_RegionBox.TabIndex = 1;
             this.comboSpHit_RegionBox.SelectedIndexChanged += new System.EventHandler(this.comboSpHit_RegionBox_SelectedIndexChanged);
             this.comboSpHit_RegionBox.MouseLeave += new System.EventHandler(this.combooSpHit_checkedBoxLeave);
@@ -544,7 +545,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.comboSpHit_TargetBox.Location = new System.Drawing.Point(10, 58);
             this.comboSpHit_TargetBox.Name = "comboSpHit_TargetBox";
             this.comboSpHit_TargetBox.ScrollAlwaysVisible = true;
-            this.comboSpHit_TargetBox.Size = new System.Drawing.Size(158, 82);
+            this.comboSpHit_TargetBox.Size = new System.Drawing.Size(158, 68);
             this.comboSpHit_TargetBox.TabIndex = 0;
             this.comboSpHit_TargetBox.SelectedIndexChanged += new System.EventHandler(this.comboSpHit_TargetBox_SelectedIndexChanged);
             this.comboSpHit_TargetBox.MouseLeave += new System.EventHandler(this.combooSpHit_checkedBoxLeave);
@@ -577,7 +578,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             this.label8.Location = new System.Drawing.Point(7, 87);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(42, 13);
+            this.label8.Size = new System.Drawing.Size(53, 16);
             this.label8.TabIndex = 12;
             this.label8.Text = "Volume";
             // 
@@ -587,7 +588,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             this.label7.Location = new System.Drawing.Point(7, 59);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(38, 13);
+            this.label7.Size = new System.Drawing.Size(46, 16);
             this.label7.TabIndex = 11;
             this.label7.Text = "Sound";
             // 
@@ -602,13 +603,14 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "Very Loud"});
             this.comboHit_SoundVol.Location = new System.Drawing.Point(66, 84);
             this.comboHit_SoundVol.Name = "comboHit_SoundVol";
-            this.comboHit_SoundVol.Size = new System.Drawing.Size(93, 21);
+            this.comboHit_SoundVol.Size = new System.Drawing.Size(93, 24);
             this.comboHit_SoundVol.TabIndex = 10;
             this.comboHit_SoundVol.SelectedIndexChanged += new System.EventHandler(this.comboHit_SoundVol_SelectedIndexChanged);
             // 
             // comboHit_Sound
             // 
             this.comboHit_Sound.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboHit_Sound.DropDownWidth = 150;
             this.comboHit_Sound.FormattingEnabled = true;
             this.comboHit_Sound.Items.AddRange(new object[] {
             "None",
@@ -623,7 +625,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "Splash",
             "Grass",
             "Explosion",
-            "Unused? (12: Peach-Only)",
+            "3x (Plays Custom 1, 2 & 3)",
             "Thud (Snake-Only)",
             "Slam (Ike-Only)",
             "Hammer (Dedede-Only)",
@@ -639,16 +641,20 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "Finale (Mario-Only)",
             "Coin (Luigi-Only)",
             "Bat (Ness-Only)",
-            "Freeze"});
+            "Freeze",
+            "Custom 1 (RA-Basic 8)",
+            "Custom 2 (RA-Basic 9)",
+            "Custom 3 (RA-Basic 10)"});
             this.comboHit_Sound.Location = new System.Drawing.Point(66, 56);
             this.comboHit_Sound.Name = "comboHit_Sound";
-            this.comboHit_Sound.Size = new System.Drawing.Size(93, 21);
+            this.comboHit_Sound.Size = new System.Drawing.Size(93, 24);
             this.comboHit_Sound.TabIndex = 9;
             this.comboHit_Sound.SelectedIndexChanged += new System.EventHandler(this.comboHit_Sound_SelectedIndexChanged);
             // 
             // comboHit_Attribute
             // 
             this.comboHit_Attribute.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboHit_Attribute.DropDownWidth = 130;
             this.comboHit_Attribute.FormattingEnabled = true;
             this.comboHit_Attribute.Items.AddRange(new object[] {
             "Normal",
@@ -685,7 +691,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "Unused (31)"});
             this.comboHit_Attribute.Location = new System.Drawing.Point(66, 30);
             this.comboHit_Attribute.Name = "comboHit_Attribute";
-            this.comboHit_Attribute.Size = new System.Drawing.Size(93, 21);
+            this.comboHit_Attribute.Size = new System.Drawing.Size(93, 24);
             this.comboHit_Attribute.TabIndex = 8;
             this.comboHit_Attribute.SelectedIndexChanged += new System.EventHandler(this.comboHit_Attribute_SelectedIndexChanged);
             // 
@@ -694,7 +700,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(7, 33);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(46, 13);
+            this.label6.Size = new System.Drawing.Size(55, 16);
             this.label6.TabIndex = 7;
             this.label6.Text = "Attribute";
             // 
@@ -731,7 +737,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             "Energy"});
             this.comboHit_Type.Location = new System.Drawing.Point(66, 3);
             this.comboHit_Type.Name = "comboHit_Type";
-            this.comboHit_Type.Size = new System.Drawing.Size(93, 21);
+            this.comboHit_Type.Size = new System.Drawing.Size(93, 24);
             this.comboHit_Type.TabIndex = 6;
             this.comboHit_Type.SelectedIndexChanged += new System.EventHandler(this.comboHit_Type_SelectedIndexChanged);
             // 
@@ -740,7 +746,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(7, 6);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(31, 13);
+            this.label5.Size = new System.Drawing.Size(39, 16);
             this.label5.TabIndex = 5;
             this.label5.Text = "Type";
             // 
@@ -762,7 +768,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.comboHit_check_Hit_Air.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
             this.comboHit_check_Hit_Air.Location = new System.Drawing.Point(78, 141);
             this.comboHit_check_Hit_Air.Name = "comboHit_check_Hit_Air";
-            this.comboHit_check_Hit_Air.Size = new System.Drawing.Size(38, 17);
+            this.comboHit_check_Hit_Air.Size = new System.Drawing.Size(43, 19);
             this.comboHit_check_Hit_Air.TabIndex = 4;
             this.comboHit_check_Hit_Air.Text = "Air";
             this.comboHit_check_Hit_Air.UseVisualStyleBackColor = true;
@@ -774,7 +780,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.comboHit_check_Hit_Ground.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
             this.comboHit_check_Hit_Ground.Location = new System.Drawing.Point(10, 141);
             this.comboHit_check_Hit_Ground.Name = "comboHit_check_Hit_Ground";
-            this.comboHit_check_Hit_Ground.Size = new System.Drawing.Size(61, 17);
+            this.comboHit_check_Hit_Ground.Size = new System.Drawing.Size(70, 19);
             this.comboHit_check_Hit_Ground.TabIndex = 3;
             this.comboHit_check_Hit_Ground.Text = "Ground";
             this.comboHit_check_Hit_Ground.UseVisualStyleBackColor = true;
@@ -786,7 +792,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.comboHit_check_Clank.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
             this.comboHit_check_Clank.Location = new System.Drawing.Point(10, 114);
             this.comboHit_check_Clank.Name = "comboHit_check_Clank";
-            this.comboHit_check_Clank.Size = new System.Drawing.Size(52, 17);
+            this.comboHit_check_Clank.Size = new System.Drawing.Size(60, 19);
             this.comboHit_check_Clank.TabIndex = 2;
             this.comboHit_check_Clank.Text = "Clank";
             this.comboHit_check_Clank.UseVisualStyleBackColor = true;
@@ -798,7 +804,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.comboHit_check_Rebound.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
             this.comboHit_check_Rebound.Location = new System.Drawing.Point(78, 114);
             this.comboHit_check_Rebound.Name = "comboHit_check_Rebound";
-            this.comboHit_check_Rebound.Size = new System.Drawing.Size(69, 17);
+            this.comboHit_check_Rebound.Size = new System.Drawing.Size(80, 19);
             this.comboHit_check_Rebound.TabIndex = 1;
             this.comboHit_check_Rebound.Text = "Rebound";
             this.comboHit_check_Rebound.UseVisualStyleBackColor = true;
@@ -810,7 +816,7 @@ namespace BrawlLib.Internal.Windows.Forms.Moveset
             this.comboHit_check_Direct.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F);
             this.comboHit_check_Direct.Location = new System.Drawing.Point(10, 169);
             this.comboHit_check_Direct.Name = "comboHit_check_Direct";
-            this.comboHit_check_Direct.Size = new System.Drawing.Size(53, 17);
+            this.comboHit_check_Direct.Size = new System.Drawing.Size(61, 19);
             this.comboHit_check_Direct.TabIndex = 0;
             this.comboHit_check_Direct.Text = "Direct";
             this.comboHit_check_Direct.UseVisualStyleBackColor = true;
