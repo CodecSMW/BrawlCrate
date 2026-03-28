@@ -968,7 +968,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
-        public int effect, unk1, sound, soundVol, unk2, ground, air, unk3, type, clang, unk4, direct, unk5;
+        public int effect, unk1, sound, soundVol, unk2, ground, air, odd, unk3, type, clang, rebound, direct, unk5;
 
         [Category("MoveDef Hitbox Flags")]
         public HitboxEffect Effect
@@ -1045,7 +1045,16 @@ namespace BrawlLib.SSBB.ResourceNodes
                 CalcFlags();
             }
         }
-
+        [Category("MoveDef Hitbox Flags")]
+        public bool Odd
+        {
+            get => val.Odd != 0;
+            set
+            {
+                odd = value ? 1 : 0;
+                CalcFlags();
+            }
+        }
         [Category("MoveDef Hitbox Flags")]
         public int Unk3
         {
@@ -1080,12 +1089,12 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("MoveDef Hitbox Flags")]
-        public bool Unk4
+        public bool Rebound
         {
-            get => val.Unk4 != 0;
+            get => val.Rebound != 0;
             set
             {
-                unk4 = value ? 1 : 0;
+                rebound = value ? 1 : 0;
                 CalcFlags();
             }
         }
@@ -1139,10 +1148,11 @@ namespace BrawlLib.SSBB.ResourceNodes
                        (unk2 << 14) |
                        (ground << 16) |
                        (air << 17) |
-                       (unk3 << 18) |
+                       (odd << 18) |
+                       (unk3 << 19) |
                        (type << 22) |
                        (clang << 27) |
-                       (unk4 << 28) |
+                       (rebound << 28) |
                        (direct << 29) |
                        (unk5 << 30);
 
@@ -1162,10 +1172,11 @@ namespace BrawlLib.SSBB.ResourceNodes
             unk2 = val.Unk2;
             ground = val.Grounded;
             air = val.Aerial;
+            odd = val.Odd;
             unk3 = val.Unk3;
             type = val.Type;
             clang = val.Clang;
-            unk4 = val.Unk4;
+            rebound = val.Rebound;
             direct = val.Direct;
             unk5 = val.Unk5;
         }
@@ -1194,10 +1205,11 @@ namespace BrawlLib.SSBB.ResourceNodes
         public int Unk2 => (data >> 14) & 0b11;
         public int Grounded => (data >> 16) & 1;
         public int Aerial => (data >> 17) & 1;
-        public int Unk3 => (data >> 18) & 0b1111;
+        public int Odd => (data >> 18) & 1;
+        public int Unk3 => (data >> 19) & 0b111;
         public int Type => (data >> 22) & 0b11111;
         public int Clang => (data >> 27) & 1;
-        public int Unk4 => (data >> 28) & 1;
+        public int Rebound => (data >> 28) & 1;
         public int Direct => (data >> 29) & 1;
         public int Unk5 => (data >> 30) & 0b11;
 
@@ -1225,13 +1237,15 @@ namespace BrawlLib.SSBB.ResourceNodes
             shield,
             absorb,
             reflect,
-            unk3,
-            invinc,
+            friendlyFire,
             grip,
-            unk4,
-            freeze,
-            sleep,
-            flinch;
+            ignoreIntang,
+            ignoreInvinc,
+            noFreeze,
+            noHitGFX,
+            noFlinch,
+            cstm_KO100,
+            cstm_Front;
 
         public Bin16 hitBits;
 
@@ -1282,50 +1296,6 @@ namespace BrawlLib.SSBB.ResourceNodes
         [Category("Hit Flags")]
         public bool CanHitMultiplayerCharacters
         {
-            get => val.GetHitBit(0) != 0;
-            set
-            {
-                hitBits[0] = value;
-                CalcFlags();
-            }
-        }
-
-        [Category("Hit Flags")]
-        public bool CanHitSSEenemies
-        {
-            get => val.GetHitBit(1) != 0;
-            set
-            {
-                hitBits[1] = value;
-                CalcFlags();
-            }
-        }
-
-        [Category("Hit Flags")]
-        public bool CanHitUnk1
-        {
-            get => val.GetHitBit(2) != 0;
-            set
-            {
-                hitBits[2] = value;
-                CalcFlags();
-            }
-        }
-
-        [Category("Hit Flags")]
-        public bool CanHitUnk2
-        {
-            get => val.GetHitBit(3) != 0;
-            set
-            {
-                hitBits[3] = value;
-                CalcFlags();
-            }
-        }
-
-        [Category("Hit Flags")]
-        public bool CanHitUnk3
-        {
             get => val.GetHitBit(4) != 0;
             set
             {
@@ -1335,7 +1305,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Hit Flags")]
-        public bool CanHitUnk4
+        public bool CanHitSSEenemies
         {
             get => val.GetHitBit(5) != 0;
             set
@@ -1346,7 +1316,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Hit Flags")]
-        public bool CanHitUnk5
+        public bool CanHitUnk1
         {
             get => val.GetHitBit(6) != 0;
             set
@@ -1357,7 +1327,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Hit Flags")]
-        public bool CanHitDamageableCeilings
+        public bool CanHitItems
         {
             get => val.GetHitBit(7) != 0;
             set
@@ -1368,7 +1338,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Hit Flags")]
-        public bool CanHitDamageableWalls
+        public bool CanHitUnk2
         {
             get => val.GetHitBit(8) != 0;
             set
@@ -1379,7 +1349,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Hit Flags")]
-        public bool CanHitDamageableFloors
+        public bool CanHitUnk3
         {
             get => val.GetHitBit(9) != 0;
             set
@@ -1390,7 +1360,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Hit Flags")]
-        public bool CanHitUnk6
+        public bool CanHitDestroyableObjects
         {
             get => val.GetHitBit(10) != 0;
             set
@@ -1401,7 +1371,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Hit Flags")]
-        public bool CanHitUnk7
+        public bool CanHitDamageableWalls
         {
             get => val.GetHitBit(11) != 0;
             set
@@ -1412,7 +1382,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Hit Flags")]
-        public bool CanHitUnk8
+        public bool SSE_CanHitDamageableItems
         {
             get => val.GetHitBit(12) != 0;
             set
@@ -1423,7 +1393,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Hit Flags")]
-        public bool Enabled
+        public bool CanHitDamageableFloors
         {
             get => val.GetHitBit(13) != 0;
             set
@@ -1433,13 +1403,67 @@ namespace BrawlLib.SSBB.ResourceNodes
             }
         }
 
-        [Category("Special Hitbox Flags")]
-        public int Unk3
+        [Category("Hit Flags")]
+        public bool CanHitRegion_Body
         {
-            get => val.Unk3;
+            get => val.GetHitBit(0) != 0;
             set
             {
-                unk3 = (int) value;
+                hitBits[0] = value;
+                CalcFlags();
+            }
+        }
+
+        [Category("Hit Flags")]
+        public bool CanHitRegion_Arm
+        {
+            get => val.GetHitBit(1) != 0;
+            set
+            {
+                hitBits[1] = value;
+                CalcFlags();
+            }
+        }
+
+        [Category("Hit Flags")]
+        public bool CanHitRegion_Knee
+        {
+            get => val.GetHitBit(2) != 0;
+            set
+            {
+                hitBits[2] = value;
+                CalcFlags();
+            }
+        }
+
+        [Category("Hit Flags")]
+        public bool CanHitRegion_Leg
+        {
+            get => val.GetHitBit(3) != 0;
+            set
+            {
+                hitBits[3] = value;
+                CalcFlags();
+            }
+        }
+
+        [Category("Special Hitbox Flags")]
+        public bool Custom_KO_At_100
+        {
+            get => val.CustomKO100 != 0;
+            set
+            {
+                cstm_KO100 = value ? 1 : 0;
+                CalcFlags();
+            }
+        }
+        [Category("Special Hitbox Flags")]
+        public bool Custom_Front
+        {
+            get => val.CustomFront != 0;
+            set
+            {
+                cstm_Front = value ? 1 : 0;
                 CalcFlags();
             }
         }
@@ -1478,12 +1502,23 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Special Hitbox Flags")]
-        public int Unk4
+        public bool IgnoreIntangibility
         {
-            get => val.Unk4;
+            get => val.IgnoreIntang != 0;
             set
             {
-                unk4 = (int) value;
+                ignoreIntang = value ? 1 : 0;
+                CalcFlags();
+            }
+        }
+
+        [Category("Special Hitbox Flags")]
+        public bool IgnoreInvincibility
+        {
+            get => val.IgnoreInvinc != 0;
+            set
+            {
+                ignoreInvinc = value ? 1 : 0;
                 CalcFlags();
             }
         }
@@ -1500,12 +1535,12 @@ namespace BrawlLib.SSBB.ResourceNodes
         }
 
         [Category("Special Hitbox Flags")]
-        public bool IgnoreInvincibility
+        public bool IgnoreTeamSettings
         {
-            get => val.IgnoreInv != 0;
+            get => val.IgnoreTeam != 0;
             set
             {
-                invinc = value ? 1 : 0;
+                friendlyFire = value ? 1 : 0;
                 CalcFlags();
             }
         }
@@ -1516,18 +1551,18 @@ namespace BrawlLib.SSBB.ResourceNodes
             get => val.NoFreeze != 0;
             set
             {
-                freeze = value ? 1 : 0;
+                noFreeze = value ? 1 : 0;
                 CalcFlags();
             }
         }
 
         [Category("Special Hitbox Flags")]
-        public bool PutsToSleep
+        public bool NoHitEffect
         {
-            get => val.Sleep != 0;
+            get => val.HitEffectDisable != 0;
             set
             {
-                sleep = value ? 1 : 0;
+                noHitGFX = value ? 1 : 0;
                 CalcFlags();
             }
         }
@@ -1538,7 +1573,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             get => val.Flinchless != 0;
             set
             {
-                flinch = value ? 1 : 0;
+                noFlinch = value ? 1 : 0;
                 CalcFlags();
             }
         }
@@ -1581,16 +1616,18 @@ namespace BrawlLib.SSBB.ResourceNodes
                        ((hitBits[11] ? 1 : 0) << 17) |
                        ((hitBits[12] ? 1 : 0) << 18) |
                        ((hitBits[13] ? 1 : 0) << 19) |
-                       (unk3 << 20) |
+                       (cstm_KO100 << 20) |
+                       (cstm_Front << 21) |
                        (shield << 22) |
                        (reflect << 23) |
                        (absorb << 24) |
-                       (unk4 << 25) |
+                       (ignoreIntang << 25) |
+                       (ignoreInvinc << 26) |
                        (grip << 27) |
-                       (invinc << 28) |
-                       (freeze << 29) |
-                       (sleep << 30) |
-                       (flinch << 31);
+                       (friendlyFire << 28) |
+                       (noFreeze << 29) |
+                       (noHitGFX << 30) |
+                       (noFlinch << 31);
 
             _value = val.data;
 
@@ -1619,16 +1656,18 @@ namespace BrawlLib.SSBB.ResourceNodes
             hitBits[11] = val.GetHitBit(11) != 0;
             hitBits[12] = val.GetHitBit(12) != 0;
             hitBits[13] = val.GetHitBit(13) != 0;
-            unk3 = val.Unk3;
+            cstm_KO100 = val.CustomKO100;
+            cstm_Front = val.CustomFront;
             shield = val.Shieldable;
             reflect = val.Reflectable;
             absorb = val.Absorbable;
-            unk4 = val.Unk4;
+            ignoreInvinc = val.IgnoreInvinc;
+            ignoreIntang = val.IgnoreIntang;
             grip = val.Gripped;
-            invinc = val.IgnoreInv;
-            freeze = val.NoFreeze;
-            sleep = val.Sleep;
-            flinch = val.Flinchless;
+            friendlyFire = val.IgnoreTeam;
+            noFreeze = val.NoFreeze;
+            noHitGFX = val.HitEffectDisable;
+            noFlinch = val.Flinchless;
         }
     }
 
@@ -1682,15 +1721,17 @@ namespace BrawlLib.SSBB.ResourceNodes
             return (data >> (6 + index)) & 1;
         } //Max index is 13, starting with 0
 
-        public int Unk3 => (data >> 20) & 3;
+        public int CustomKO100 => (data >> 20) & 1;
+        public int CustomFront => (data >> 21) & 1;
         public int Shieldable => (data >> 22) & 1;
         public int Reflectable => (data >> 23) & 1;
         public int Absorbable => (data >> 24) & 1;
-        public int Unk4 => (data >> 25) & 3;
+        public int IgnoreInvinc => (data >> 25) & 1;
+        public int IgnoreIntang => (data >> 26) & 1;
         public int Gripped => (data >> 27) & 1;
-        public int IgnoreInv => (data >> 28) & 1;
+        public int IgnoreTeam => (data >> 28) & 1;
         public int NoFreeze => (data >> 29) & 1;
-        public int Sleep => (data >> 30) & 1;
+        public int HitEffectDisable => (data >> 30) & 1;
         public int Flinchless => (data >> 31) & 1;
 
         public int data;
